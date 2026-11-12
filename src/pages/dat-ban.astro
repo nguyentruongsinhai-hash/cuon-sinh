@@ -1,0 +1,29 @@
+---
+// Trang đặt bàn riêng. Địa chỉ /dat-ban/ có từ site cũ và đã gửi cho khách,
+// gắn ở Fanpage: đừng đổi tên file. Form dùng chung với mục #dat-ban ở trang chủ.
+import FormDatBan from '../components/FormDatBan.astro';
+import { HOTLINE, HOTLINE_TEL } from '../consts';
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+	title="Đặt bàn"
+	description="Đặt bàn trực tuyến tại Nhà hàng Cuốn Sinh, Số 3 ngõ 58 Vũ Trọng Phụng, Thanh Xuân, Hà Nội."
+>
+	<section class="sec">
+		<div class="wrap book">
+			<div class="book__info">
+				<p class="eyebrow">Giữ chỗ trong một phút</p>
+				<h1>Đặt bàn</h1>
+				<p>Điền thông tin, nhân viên Cuốn Sinh sẽ gọi lại xác nhận bàn cho anh chị.</p>
+				<ul class="steps">
+					<li><span>1</span>Chọn ngày, giờ và số người</li>
+					<li><span>2</span>Quán gọi lại xác nhận</li>
+					<li><span>3</span>Đến quán, bàn đã sẵn</li>
+				</ul>
+				<p class="book__call">Cần gấp trong hôm nay? Gọi <a href={HOTLINE_TEL}>{HOTLINE}</a></p>
+			</div>
+			<FormDatBan />
+		</div>
+	</section>
+</Base>
