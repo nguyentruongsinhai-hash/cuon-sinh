@@ -1,0 +1,9 @@
+{
+  "name": "cuon-sinh",
+  "private": true,
+  "description": "Website nhà hàng Cuốn Sinh (cuonsinh.com)",
+  "scripts": {
+    "test": "node --test",
+    "lint": "node --check assets/js/theme.js && node --check assets/js/site.js"
+  }
+}

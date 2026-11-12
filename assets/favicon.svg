@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<title>Cuốn Sinh</title>
+<rect width="64" height="64" rx="13" fill="#fbf8f1"/>
+<path d="M7 45 25 10Q42 14 58 36L7 48Z" fill="#f37019"/>
+<path d="M25 12 14 42 17 41Z M28 14 30 38 33 37Z M30 15 48 32 51 31Z" fill="#fff"/>
+<path d="M7 45Q30 25 53 30Q62 32 58 40Q41 52 13 53Q3 52 7 45Z" fill="#008342"/>
+<path d="M12 46Q33 33 53 34Q57 34 54 38Q35 47 15 48Q9 49 12 46Z" fill="#fbf8f1"/>
+</svg>
