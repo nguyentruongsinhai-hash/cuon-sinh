@@ -10,5 +10,9 @@
 	},
 	"observability": {
 		"enabled": true
-	}
+	},
+	// Giữ địa chỉ thử workers.dev và địa chỉ xem thử của nhánh luôn bật.
+	// Thiếu hai dòng này, hễ thêm "routes" là wrangler tự tắt cả hai.
+	"workers_dev": true,
+	"preview_urls": true
 }
