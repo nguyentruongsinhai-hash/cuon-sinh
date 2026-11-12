@@ -7,9 +7,12 @@ const { date } = Astro.props;
 ---
 
 <time datetime={date.toISOString()}>
-	{date.toLocaleDateString('en-us', {
-		year: 'numeric',
-		month: 'short',
-		day: 'numeric',
-	})}
+	{
+		date.toLocaleDateString('vi-VN', {
+			day: 'numeric',
+			month: 'long',
+			year: 'numeric',
+			timeZone: 'Asia/Ho_Chi_Minh',
+		})
+	}
 </time>

@@ -1,0 +1,68 @@
+---
+// Khung chung của mọi trang: đầu trang, chân trang, thanh thao tác nhanh,
+// giao diện sáng/tối. Script giao diện được nhúng thẳng vào <head> để chạy
+// trước khi trang vẽ (không nháy màu); logic nằm ở src/scripts/theme.cjs.
+import Dock from '../components/Dock.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { DEFAULT_OG_IMAGE, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE } from '../consts';
+import themeScript from '../scripts/theme.cjs?raw';
+
+interface Props {
+	title?: string;
+	description?: string;
+	image?: string;
+	ogType?: string;
+}
+
+const {
+	title,
+	description = SITE_DESCRIPTION,
+	image = DEFAULT_OG_IMAGE,
+	ogType = 'website',
+} = Astro.props;
+const fullTitle = title ? `${title} | ${SITE_NAME}` : SITE_TITLE;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="vi" data-theme="light">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<title>{fullTitle}</title>
+		<meta name="description" content={description} />
+		<meta name="theme-color" content="#fbf8f1" />
+		<link rel="canonical" href={canonical} />
+		<meta property="og:type" content={ogType} />
+		<meta property="og:locale" content="vi_VN" />
+		<meta property="og:site_name" content={SITE_NAME} />
+		<meta property="og:title" content={fullTitle} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:image" content={new URL(image, Astro.site)} />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="sitemap" href="/sitemap-index.xml" />
+		<link rel="alternate" type="application/rss+xml" title={SITE_NAME} href="/rss.xml" />
+		<!-- Đặt giao diện sáng/tối TRƯỚC khi trang vẽ ra để không nháy màu -->
+		<script is:inline set:html={themeScript} />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="/assets/css/site.css" />
+		<slot name="head" />
+	</head>
+	<body>
+		<a class="skip" href="#noi-dung">Bỏ qua, tới nội dung chính</a>
+		<Header />
+		<main id="noi-dung">
+			<slot />
+		</main>
+		<Footer />
+		<Dock />
+		<script is:inline src="/assets/js/site.js" defer></script>
+	</body>
+</html>

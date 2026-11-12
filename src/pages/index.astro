@@ -1,59 +1,390 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+// Trang chủ Cuốn Sinh. Đầu trang, chân trang và giao diện sáng/tối nằm ở khung chung Base.astro.
+import Base from '../layouts/Base.astro';
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This
-				template serves as a lightweight, minimally-styled starting point for anyone looking to
-				build a personal website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your{' '}
-				<code>astro.config.mjs</code> file. You can customize your setup with{' '}
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like
-				Tailwind, React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>
-					Edit this page in <code>src/pages/index.astro</code>
-				</li>
-				<li>
-					Edit the site header items in <code>src/components/Header.astro</code>
-				</li>
-				<li>
-					Add your name to the footer in <code>src/components/Footer.astro</code>
-				</li>
-				<li>
-					Check out the included blog posts in <code>src/content/blog/</code>
-				</li>
-				<li>
-					Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code>
-				</li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to{' '}
-				<a href="https://docs.astro.build/">read the docs</a> or{' '}
-				<a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out{' '}
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a> by{' '}
-				<a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
-		</main>
-		<Footer />
-	</body>
-</html>
+<Base ogType="restaurant">
+<Fragment slot="head">
+<link rel="preload" as="image" href="/assets/img/set-cuon-tong-hop.webp" fetchpriority="high">
+<script is:inline type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Restaurant",
+  "name": "Nhà hàng Cuốn Sinh",
+  "url": "https://cuonsinh.com/",
+  "telephone": "+84844566922",
+  "servesCuisine": ["Món Việt", "Món cuốn", "Lẩu"],
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Số 3, ngõ 58 Vũ Trọng Phụng",
+    "addressLocality": "Thanh Xuân",
+    "addressRegion": "Hà Nội",
+    "addressCountry": "VN"
+  },
+  "openingHoursSpecification": [
+    {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"], "opens": "09:00", "closes": "14:00"},
+    {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"], "opens": "16:30", "closes": "22:00"}
+  ],
+  "sameAs": ["https://www.facebook.com/nhahangcuonsinh"]
+}
+</script>
+</Fragment>
+
+<!-- ============ 1. HERO ============ -->
+<section class="hero">
+  <div class="wrap hero__in">
+    <div class="hero__text">
+      <p class="eyebrow">Món cuốn · Lẩu · Món Việt chia sẻ</p>
+      <h1>Tươi ngon mỗi cuốn,<br><span class="hl">ấm áp mỗi bữa.</span></h1>
+      <p class="lead">Cuốn Sinh là quán ăn Việt để cả nhà, cả nhóm ngồi lại, cùng cuốn, cùng chia sẻ. Ngay ngõ 58 Vũ Trọng Phụng, Thanh Xuân.</p>
+      <div class="hero__cta">
+        <a class="btn btn--primary btn--lg" href="#dat-ban">Đặt bàn ngay</a>
+        <a class="btn btn--ghost btn--lg" href="#mon-noi-bat">Xem thực đơn</a>
+      </div>
+      <p class="open" id="trang-thai-mo" hidden><span class="open__dot" aria-hidden="true"></span><span class="open__txt"></span></p>
+    </div>
+    <div class="hero__media">
+      <img src="/assets/img/set-cuon-tong-hop.webp" alt="Set cuốn tổng hợp của Cuốn Sinh với bánh tráng, rau sống, nem lụi và thịt" width="667" height="1000" fetchpriority="high">
+      <div class="hero__tag">
+        <strong>Set cuốn tổng hợp</strong>
+        <span>288.000đ</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <ul class="facts">
+      <li><strong>9:00 - 14:00</strong><span>Ca trưa</span></li>
+      <li><strong>16:30 - 22:00</strong><span>Ca tối</span></li>
+      <li><strong>2 tầng · 76 chỗ</strong><span>Hợp nhóm bạn, gia đình</span></li>
+      <li><strong>Từ 315.000đ</strong><span>Combo cho 2 người</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 2. BỐN TRỤ CỘT ============ -->
+<section class="sec" aria-labelledby="h-tru-cot">
+  <div class="wrap">
+    <div class="sec__head reveal">
+      <p class="eyebrow">Vì sao là Cuốn Sinh</p>
+      <h2 id="h-tru-cot">Bốn điều quán giữ trong từng bữa</h2>
+    </div>
+    <ul class="pillars">
+      <li class="pillar reveal">
+        <span class="pillar__ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 19c0-8 5-13 14-14 0 9-4 14-12 14M5 19c2-5 5-8 9-10"/></svg></span>
+        <h3>Tươi</h3>
+        <p>Rau xanh, thịt, hải sản lên bàn còn tươi, cuốn đến đâu ngon đến đó.</p>
+      </li>
+      <li class="pillar reveal">
+        <span class="pillar__ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-9.6A4 4 0 0 1 12 8a4 4 0 0 1 7 2.4C19 15.6 12 20 12 20z"/></svg></span>
+        <h3>Tử tế</h3>
+        <p>Giá niêm yết rõ ràng, phần ăn đúng như thực đơn.</p>
+      </li>
+      <li class="pillar reveal">
+        <span class="pillar__ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 11.5 12 5l8 6.5M6.5 10v9h11v-9M10 19v-5h4v5"/></svg></span>
+        <h3>Ấm áp</h3>
+        <p>Bàn ăn bày ra để chia sẻ: mỗi người một tay cuốn, câu chuyện tự nhiên rôm rả.</p>
+      </li>
+      <li class="pillar reveal">
+        <span class="pillar__ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="m8.5 12.2 2.4 2.4 4.6-5"/></svg></span>
+        <h3>Chuẩn</h3>
+        <p>Món Việt nấu đúng vị, ra món đều tay, hôm nay ngon thế nào thì lần sau vẫn vậy.</p>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 3. MÓN NỔI BẬT ============ -->
+<section class="sec sec--alt" id="mon-noi-bat" aria-labelledby="h-mon">
+  <div class="wrap">
+    <div class="sec__head sec__head--row reveal">
+      <div>
+        <p class="eyebrow">Thực đơn</p>
+        <h2 id="h-mon">Món nên thử ở Cuốn Sinh</h2>
+      </div>
+      <div class="tabs" role="group" aria-label="Lọc món theo nhóm">
+        <button type="button" class="tab is-on" data-cat="hot" aria-pressed="true">Nổi bật</button>
+        <button type="button" class="tab" data-cat="cuon" aria-pressed="false">Cuốn</button>
+        <button type="button" class="tab" data-cat="lau" aria-pressed="false">Lẩu</button>
+        <button type="button" class="tab" data-cat="chinh" aria-pressed="false">Món chính</button>
+        <button type="button" class="tab" data-cat="goi" aria-pressed="false">Gỏi, nộm</button>
+      </div>
+    </div>
+
+    <ul class="dishes" id="ds-mon">
+      <li class="dish" data-cat="cuon" data-hot>
+        <div class="dish__img"><img src="/assets/img/set-cuon-tong-hop.webp" alt="Set cuốn tổng hợp" width="667" height="1000" loading="lazy"></div>
+        <div class="dish__body"><span class="chip">Cuốn</span><h3>Set cuốn tổng hợp</h3><p class="price">288.000đ</p></div>
+      </li>
+      <li class="dish" data-cat="cuon" data-hot>
+        <div class="dish__img"><img src="/assets/img/cuon-heo-quay-nho.webp" alt="Cuốn heo quay" width="1000" height="667" loading="lazy"></div>
+        <div class="dish__body"><span class="chip">Cuốn</span><h3>Cuốn heo quay - nhỏ</h3><p class="price">98.000đ</p></div>
+      </li>
+      <li class="dish" data-cat="cuon">
+        <div class="dish__img"><img src="/assets/img/cuon-nem-lui-hue.webp" alt="Set cuốn nem lụi Huế" width="1000" height="667" loading="lazy"></div>
+        <div class="dish__body"><span class="chip">Cuốn</span><h3>Set cuốn nem lụi Huế</h3><p class="price">129.000đ</p></div>
+      </li>
+      <li class="dish" data-cat="cuon">
+        <div class="dish__img"><img src="/assets/img/cuon-ca-lang-nuong-rieng.webp" alt="Cuốn cá lăng nướng riềng" width="1000" height="573" loading="lazy"></div>
+        <div class="dish__body"><span class="chip">Cuốn</span><h3>Cuốn cá lăng nướng riềng</h3><p class="price">198.000đ</p></div>
+      </li>
+
+      <li class="dish" data-cat="lau" data-hot>
+        <div class="dish__img"><img src="/assets/img/lau-cua-song-sieu-gach.webp" alt="Lẩu cua sông siêu gạch" width="1000" height="666" loading="lazy"></div>
+        <div class="dish__body"><span class="chip">Lẩu</span><h3>Lẩu cua sông siêu gạch</h3><p class="price">618.000đ</p></div>
+      </li>
+      <li class="dish" data-cat="lau" data-hot>
+        <div class="dish__img"><img src="/assets/img/lau-tom-bau-a-sinh.webp" alt="Lẩu tôm bầu A Sinh" width="1000" height="669" loading="lazy"></div>
+        <div class="dish__body"><span class="chip">Lẩu</span><h3>Lẩu tôm bầu A Sinh</h3><p class="price">618.000đ</p></div>
+      </li>
+      <li class="dish" data-cat="lau">
+        <div class="dish__img"><img src="/assets/img/lau-oc-sai-thanh.webp" alt="Lẩu ốc Sài Thành nồi lớn" width="667" height="1000" loading="lazy"></div>
+        <div class="dish__body"><span class="chip">Lẩu</span><h3>Lẩu ốc Sài Thành - nồi lớn</h3><p class="price">588.000đ</p></div>
+      </li>
+      <li class="dish" data-cat="lau">
+        <div class="dish__img"><img src="/assets/img/lau-be-to-nhung-me.webp" alt="Lẩu bê tơ nhúng mẻ" width="685" height="1000" loading="lazy"></div>
+        <div class="dish__body"><span class="chip">Lẩu</span><h3>Lẩu bê tơ nhúng mẻ</h3><p class="price">468.000đ</p></div>
+      </li>
+
+      <li class="dish" data-cat="chinh" data-hot>
+        <div class="dish__img"><img src="/assets/img/ga-ta-chien-mam-sai-gon.webp" alt="Gà ta chiên mắm Sài Gòn" width="986" height="1000" loading="lazy"></div>
+        <div class="dish__body"><span class="chip">Món chính</span><h3>Gà ta chiên mắm Sài Gòn</h3><p class="price">198.000đ</p></div>
+      </li>
+      <li class="dish" data-cat="chinh" data-hot>
+        <div class="dish__img"><img src="/assets/img/bo-sot-tieu-xanh-ban-gang.webp" alt="Bò sốt tiêu xanh bản gang" width="1000" height="651" loading="lazy"></div>
+        <div class="dish__body"><span class="chip">Món chính</span><h3>Bò sốt tiêu xanh bản gang</h3><p class="price">198.000đ</p></div>
+      </li>
+      <li class="dish" data-cat="chinh">
+        <div class="dish__img"><img src="/assets/img/nong-heo-chien-la-moc-mat.webp" alt="Nọng heo chiên lá móc mật" width="1000" height="666" loading="lazy"></div>
+        <div class="dish__body"><span class="chip">Món chính</span><h3>Nọng heo chiên lá móc mật</h3><p class="price">188.000đ</p></div>
+      </li>
+      <li class="dish" data-cat="chinh">
+        <div class="dish__img"><img src="/assets/img/cha-oc-boc-giay-bac.webp" alt="Chả ốc bọc giấy bạc" width="1000" height="869" loading="lazy"></div>
+        <div class="dish__body"><span class="chip">Món chính</span><h3>Chả ốc bọc giấy bạc</h3><p class="price">156.000đ</p></div>
+      </li>
+
+      <li class="dish" data-cat="goi" data-hot>
+        <div class="dish__img"><img src="/assets/img/goi-bo-keo-phao.webp" alt="Gỏi bò kéo pháo" width="980" height="1000" loading="lazy"></div>
+        <div class="dish__body"><span class="chip">Gỏi, nộm</span><h3>Gỏi bò kéo pháo</h3><p class="price">138.000đ</p></div>
+      </li>
+      <li class="dish" data-cat="goi" data-hot>
+        <div class="dish__img"><img src="/assets/img/nom-rau-cang-cua-bap-bo.webp" alt="Nộm rau càng cua bắp bò" width="1000" height="861" loading="lazy"></div>
+        <div class="dish__body"><span class="chip">Gỏi, nộm</span><h3>Nộm rau càng cua bắp bò</h3><p class="price">138.000đ</p></div>
+      </li>
+      <li class="dish" data-cat="goi">
+        <div class="dish__img"><img src="/assets/img/goi-buoi-tom-thit.webp" alt="Gỏi bưởi tôm thịt" width="974" height="1000" loading="lazy"></div>
+        <div class="dish__body"><span class="chip">Gỏi, nộm</span><h3>Gỏi bưởi tôm thịt</h3><p class="price">148.000đ</p></div>
+      </li>
+    </ul>
+
+    <p class="note reveal">Giá bán tại quán. Muốn xem thực đơn đầy đủ, anh chị nhắn quán qua
+      <a href="https://m.me/nhahangcuonsinh" target="_blank" rel="noopener">Messenger</a> là có ngay.</p>
+  </div>
+</section>
+
+<!-- ============ 4. COMBO THEO SỐ NGƯỜI ============ -->
+<section class="sec" id="combo" aria-labelledby="h-combo">
+  <div class="wrap">
+    <div class="sec__head reveal">
+      <p class="eyebrow">Combo</p>
+      <h2 id="h-combo">Đi mấy người, quán gợi ý luôn</h2>
+      <p class="sec__sub">Chọn số người, quán bày sẵn mâm vừa đủ.</p>
+    </div>
+
+    <div class="people reveal" role="group" aria-label="Chọn số người">
+      <button type="button" class="people__btn is-on" data-people="2" aria-pressed="true"><strong>2</strong> người</button>
+      <button type="button" class="people__btn" data-people="4" aria-pressed="false"><strong>4</strong> người</button>
+      <button type="button" class="people__btn" data-people="6" aria-pressed="false"><strong>6</strong> người</button>
+      <button type="button" class="people__btn" data-people="8" aria-pressed="false"><strong>8</strong> người</button>
+    </div>
+
+    <ul class="combos" id="ds-combo" aria-live="polite">
+      <li class="combo" data-people="2">
+        <p class="combo__for">2 người</p>
+        <h3>Combo Hàn Huyên</h3>
+        <p class="combo__price">315.000đ</p>
+        <ul class="ticks">
+          <li>Cuốn heo quay - nhỏ</li>
+          <li>Cuốn chân giò - nhỏ</li>
+          <li>Set cuốn nem lụi Huế</li>
+        </ul>
+        <a class="btn btn--ghost" href="#dat-ban" data-ghi-chu="Combo Hàn Huyên (2 người)" data-so-nguoi="2">Đặt bàn với combo này</a>
+      </li>
+      <li class="combo combo--lau" data-people="2">
+        <p class="combo__for">2 người · có lẩu</p>
+        <h3>Combo Tâm Giao</h3>
+        <p class="combo__price">456.000đ</p>
+        <ul class="ticks">
+          <li>Cuốn heo quay - nhỏ</li>
+          <li>1 lẩu nồi bé tự chọn: tôm bầu, cua sông hoặc ốc</li>
+        </ul>
+        <a class="btn btn--ghost" href="#dat-ban" data-ghi-chu="Combo Tâm Giao (2 người)" data-so-nguoi="2">Đặt bàn với combo này</a>
+      </li>
+
+      <li class="combo" data-people="4">
+        <p class="combo__for">4 người</p>
+        <h3>Combo Quây Quần</h3>
+        <p class="combo__price">652.000đ</p>
+        <ul class="ticks">
+          <li>Set cuốn tổng hợp</li>
+          <li>Nộm rau càng cua bắp bò</li>
+          <li>Ốc nhồi thịt hấp sả</li>
+          <li>Nấm hải sản chiên lắc muối tôm</li>
+        </ul>
+        <a class="btn btn--ghost" href="#dat-ban" data-ghi-chu="Combo Quây Quần (4 người)" data-so-nguoi="4">Đặt bàn với combo này</a>
+      </li>
+      <li class="combo combo--lau" data-people="4">
+        <p class="combo__for">4 người · có lẩu</p>
+        <h3>Combo Đoàn Viên</h3>
+        <p class="combo__price">872.000đ</p>
+        <ul class="ticks">
+          <li>Sét cuốn thịt heo quay - lớn</li>
+          <li>Nộm rau càng cua bắp bò</li>
+          <li>Gà ta chiên mắm Sài Gòn</li>
+          <li>1 lẩu nồi bé tự chọn: tôm bầu, cua sông hoặc ốc</li>
+        </ul>
+        <a class="btn btn--ghost" href="#dat-ban" data-ghi-chu="Combo Đoàn Viên (4 người)" data-so-nguoi="4">Đặt bàn với combo này</a>
+      </li>
+
+      <li class="combo combo--lau" data-people="6">
+        <p class="combo__for">6 người · có lẩu</p>
+        <h3>Combo Sum Vầy</h3>
+        <p class="combo__price">1.268.000đ</p>
+        <ul class="ticks">
+          <li>Set cuốn tổng hợp</li>
+          <li>Gỏi bò kéo pháo</li>
+          <li>Chả ốc bọc giấy bạc</li>
+          <li>Khoai tây chiên</li>
+          <li>1 lẩu nồi lớn tự chọn: tôm bầu A Sinh hoặc cua sông siêu gạch</li>
+        </ul>
+        <a class="btn btn--ghost" href="#dat-ban" data-ghi-chu="Combo Sum Vầy (6 người)" data-so-nguoi="6">Đặt bàn với combo này</a>
+      </li>
+
+      <li class="combo combo--lau" data-people="8">
+        <p class="combo__for">8 người · có lẩu</p>
+        <h3>Combo Hoan Hỷ</h3>
+        <p class="combo__price">1.784.000đ</p>
+        <ul class="ticks">
+          <li>Set cuốn tổng hợp</li>
+          <li>Gỏi bò kéo pháo</li>
+          <li>Chả ốc bọc giấy bạc</li>
+          <li>Nọng heo chiên lá móc mật</li>
+          <li>Bò sốt tiêu xanh bản gang</li>
+          <li>Gà ta chiên mắm Sài Gòn</li>
+          <li>1 lẩu nồi lớn tự chọn: tôm bầu A Sinh hoặc cua sông siêu gạch</li>
+        </ul>
+        <a class="btn btn--ghost" href="#dat-ban" data-ghi-chu="Combo Hoan Hỷ (8 người)" data-so-nguoi="8">Đặt bàn với combo này</a>
+      </li>
+    </ul>
+
+    <p class="note reveal">Combo có lẩu gồm 1 nồi lẩu chọn trong các loại ghi ở combo. Món trong combo không đổi sang món khác, anh chị muốn thêm món thì gọi thêm theo giá lẻ.</p>
+  </div>
+</section>
+
+<!-- ============ 5. KHÔNG GIAN, ĐI NHÓM ============ -->
+<section class="sec sec--brand" id="khong-gian" aria-labelledby="h-kg">
+  <div class="wrap space">
+    <div class="space__text reveal">
+      <p class="eyebrow">Không gian</p>
+      <h2 id="h-kg">Hai tầng, đủ chỗ cho bữa trưa nhanh lẫn buổi liên hoan</h2>
+      <p>Tầng 1 hợp nhóm nhỏ và bữa trưa văn phòng. Tầng 2 ghép được dãy bàn dài cho nhóm 24 đến 30 người ngồi liền nhau.</p>
+      <p>Đoàn đông, sinh nhật, liên hoan công ty: anh chị gọi trước để quán xếp bàn cho gọn.</p>
+      <a class="btn btn--light" href="tel:0844566922">Gọi 0844 566 922</a>
+    </div>
+    <ul class="stats reveal">
+      <li><strong>2</strong><span>tầng</span></li>
+      <li><strong>19</strong><span>bàn</span></li>
+      <li><strong>76</strong><span>chỗ ngồi</span></li>
+      <li><strong>24-30</strong><span>khách một dãy dài</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 6. ĐẶT BÀN ============ -->
+<section class="sec" id="dat-ban" aria-labelledby="h-db">
+  <div class="wrap book">
+    <div class="book__info reveal">
+      <p class="eyebrow">Đặt bàn</p>
+      <h2 id="h-db">Giữ chỗ trong một phút</h2>
+      <p>Điền thông tin, nhân viên Cuốn Sinh sẽ gọi lại xác nhận bàn cho anh chị.</p>
+      <ul class="steps">
+        <li><span>1</span>Chọn ngày, giờ và số người</li>
+        <li><span>2</span>Quán gọi lại xác nhận</li>
+        <li><span>3</span>Đến quán, bàn đã sẵn</li>
+      </ul>
+      <p class="book__call">Cần gấp trong hôm nay? Gọi <a href="tel:0844566922">0844 566 922</a></p>
+    </div>
+
+    <form class="form reveal" id="form-dat-ban" novalidate>
+      <div class="field">
+        <label for="f-ten">Họ tên</label>
+        <input id="f-ten" name="ho_ten" autocomplete="name" required maxlength="80">
+      </div>
+      <div class="field">
+        <label for="f-sdt">Số điện thoại</label>
+        <input id="f-sdt" name="sdt" type="tel" inputmode="tel" autocomplete="tel" required placeholder="09xx xxx xxx">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="f-ngay">Ngày đến</label>
+          <input id="f-ngay" name="ngay" type="date" required>
+        </div>
+        <div class="field">
+          <label for="f-gio">Giờ đến</label>
+          <select id="f-gio" name="gio" required></select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="f-nguoi">Số người</label>
+        <div class="stepper">
+          <button type="button" class="stepper__btn" data-step="-1" aria-label="Bớt một người">−</button>
+          <input id="f-nguoi" name="so_nguoi" type="number" inputmode="numeric" min="1" max="60" value="2" required>
+          <button type="button" class="stepper__btn" data-step="1" aria-label="Thêm một người">+</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="f-ghi-chu">Ghi chú <span class="opt">(không bắt buộc)</span></label>
+        <textarea id="f-ghi-chu" name="ghi_chu" rows="3" maxlength="500" placeholder="Sinh nhật, cần ghế trẻ em, muốn ngồi tầng 2..."></textarea>
+      </div>
+      <!-- bẫy bot: người thật không thấy ô này -->
+      <input name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <button class="btn btn--primary btn--lg btn--block" type="submit">Gửi đặt bàn</button>
+      <p class="form__hint">Quán nhận khách 9:00-14:00 và 16:30-22:00. Đặt trong ngày vui lòng đặt trước ít nhất 60 phút.</p>
+      <p class="form__msg" id="ket-qua" role="status" aria-live="polite"></p>
+      <noscript><p class="form__msg is-err">Trình duyệt đang tắt JavaScript. Anh chị gọi 0844 566 922 để đặt bàn nhé.</p></noscript>
+    </form>
+  </div>
+</section>
+
+<!-- ============ 7. LIÊN HỆ ============ -->
+<section class="sec sec--alt" id="lien-he" aria-labelledby="h-lh">
+  <div class="wrap">
+    <div class="sec__head reveal">
+      <p class="eyebrow">Ghé quán</p>
+      <h2 id="h-lh">Cuốn Sinh ở đâu?</h2>
+    </div>
+    <ul class="contacts">
+      <li class="contact reveal">
+        <h3>Địa chỉ</h3>
+        <p>Số 3, ngõ 58 Vũ Trọng Phụng, Thanh Xuân, Hà Nội</p>
+        <a class="link" href="https://www.google.com/maps/search/?api=1&amp;query=Nh%C3%A0+h%C3%A0ng+Cu%E1%BB%91n+Sinh%2C+S%E1%BB%91+3+ng%C3%B5+58+V%C5%A9+Tr%E1%BB%8Dng+Ph%E1%BB%A5ng%2C+Thanh+Xu%C3%A2n%2C+H%C3%A0+N%E1%BB%99i" target="_blank" rel="noopener">Chỉ đường trên Google Maps</a>
+      </li>
+      <li class="contact reveal">
+        <h3>Giờ nhận khách</h3>
+        <p>Ca trưa 9:00 - 14:00<br>Ca tối 16:30 - 22:00</p>
+      </li>
+      <li class="contact reveal">
+        <h3>Đặt bàn, hỏi món</h3>
+        <p><a class="big" href="tel:0844566922">0844 566 922</a></p>
+        <a class="link" href="https://m.me/nhahangcuonsinh" target="_blank" rel="noopener">Nhắn Messenger</a>
+      </li>
+      <li class="contact reveal">
+        <h3>Theo dõi quán</h3>
+        <p>Món mới và ưu đãi đăng trên fanpage.</p>
+        <a class="link" href="https://www.facebook.com/nhahangcuonsinh" target="_blank" rel="noopener">facebook.com/nhahangcuonsinh</a>
+      </li>
+    </ul>
+  </div>
+</section>
+
+</Base>
