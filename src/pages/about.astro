@@ -1,63 +1,112 @@
 ---
-import AboutHeroImage from '../assets/blog-placeholder-about.jpg';
-import Layout from '../layouts/BlogPost.astro';
+import { HOTLINE, HOTLINE_TEL, MAPS_URL } from '../consts';
+import Base from '../layouts/Base.astro';
 ---
 
-<Layout
-	title="About Me"
-	description="Lorem ipsum dolor sit amet"
-	pubDate={new Date('August 08 2021')}
-	heroImage={AboutHeroImage}
+<Base
+	title="Giới thiệu"
+	description="Cuốn Sinh là quán món cuốn, lẩu và món Việt chia sẻ tại ngõ 58 Vũ Trọng Phụng, Thanh Xuân, Hà Nội."
 >
-	<p>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-		labore et dolore magna aliqua. Vitae ultricies leo integer malesuada nunc vel risus commodo
-		viverra. Adipiscing enim eu turpis egestas pretium. Euismod elementum nisi quis eleifend quam
-		adipiscing. In hac habitasse platea dictumst vestibulum. Sagittis purus sit amet volutpat. Netus
-		et malesuada fames ac turpis egestas. Eget magna fermentum iaculis eu non diam phasellus
-		vestibulum lorem. Varius sit amet mattis vulputate enim. Habitasse platea dictumst quisque
-		sagittis. Integer quis auctor elit sed vulputate mi. Dictumst quisque sagittis purus sit amet.
-	</p>
+	<header class="page-head wrap">
+		<p class="eyebrow">Về Cuốn Sinh</p>
+		<h1>Quán ăn Việt để <span class="hl">cùng cuốn, cùng chia sẻ.</span></h1>
+		<p class="lead">
+			Cuốn Sinh là quán ăn Việt để cả nhà, cả nhóm ngồi lại, cùng cuốn, cùng chia sẻ. Ngay ngõ 58 Vũ
+			Trọng Phụng, Thanh Xuân.
+		</p>
+	</header>
 
-	<p>
-		Morbi tristique senectus et netus. Id semper risus in hendrerit gravida rutrum quisque non
-		tellus. Habitasse platea dictumst quisque sagittis purus sit amet. Tellus molestie nunc non
-		blandit massa. Cursus vitae congue mauris rhoncus. Accumsan tortor posuere ac ut. Fringilla urna
-		porttitor rhoncus dolor. Elit ullamcorper dignissim cras tincidunt lobortis. In cursus turpis
-		massa tincidunt dui ut ornare lectus. Integer feugiat scelerisque varius morbi enim nunc.
-		Bibendum neque egestas congue quisque egestas diam. Cras ornare arcu dui vivamus arcu felis
-		bibendum. Dignissim suspendisse in est ante in nibh mauris. Sed tempus urna et pharetra pharetra
-		massa massa ultricies mi.
-	</p>
+	<section class="sec sec--tight" aria-labelledby="h-tru-cot">
+		<div class="wrap">
+			<div class="sec__head">
+				<p class="eyebrow">Vì sao là Cuốn Sinh</p>
+				<h2 id="h-tru-cot">Bốn điều quán giữ trong từng bữa</h2>
+			</div>
+			<ul class="pillars">
+				<li class="pillar reveal">
+					<span class="pillar__ic" aria-hidden="true"
+						><svg viewBox="0 0 24 24"
+							><path d="M5 19c0-8 5-13 14-14 0 9-4 14-12 14M5 19c2-5 5-8 9-10"></path></svg
+						></span
+					>
+					<h3>Tươi</h3>
+					<p>Rau xanh, thịt, hải sản lên bàn còn tươi, cuốn đến đâu ngon đến đó.</p>
+				</li>
+				<li class="pillar reveal">
+					<span class="pillar__ic" aria-hidden="true"
+						><svg viewBox="0 0 24 24"
+							><path d="M12 20s-7-4.4-7-9.6A4 4 0 0 1 12 8a4 4 0 0 1 7 2.4C19 15.6 12 20 12 20z"
+							></path></svg
+						></span
+					>
+					<h3>Tử tế</h3>
+					<p>Giá niêm yết rõ ràng, phần ăn đúng như thực đơn.</p>
+				</li>
+				<li class="pillar reveal">
+					<span class="pillar__ic" aria-hidden="true"
+						><svg viewBox="0 0 24 24"
+							><path d="M4 11.5 12 5l8 6.5M6.5 10v9h11v-9M10 19v-5h4v5"></path></svg
+						></span
+					>
+					<h3>Ấm áp</h3>
+					<p>Bàn ăn bày ra để chia sẻ: mỗi người một tay cuốn, câu chuyện tự nhiên rôm rả.</p>
+				</li>
+				<li class="pillar reveal">
+					<span class="pillar__ic" aria-hidden="true"
+						><svg viewBox="0 0 24 24"
+							><circle cx="12" cy="12" r="8"></circle><path d="m8.5 12.2 2.4 2.4 4.6-5"></path></svg
+						></span
+					>
+					<h3>Chuẩn</h3>
+					<p>Món Việt nấu đúng vị, ra món đều tay, hôm nay ngon thế nào thì lần sau vẫn vậy.</p>
+				</li>
+			</ul>
+		</div>
+	</section>
 
-	<p>
-		Mollis nunc sed id semper risus in. Convallis a cras semper auctor neque. Diam sit amet nisl
-		suscipit. Lacus viverra vitae congue eu consequat ac felis donec. Egestas integer eget aliquet
-		nibh praesent tristique magna sit amet. Eget magna fermentum iaculis eu non diam. In vitae
-		turpis massa sed elementum. Tristique et egestas quis ipsum suspendisse ultrices. Eget lorem
-		dolor sed viverra ipsum. Vel turpis nunc eget lorem dolor sed viverra. Posuere ac ut consequat
-		semper viverra nam. Laoreet suspendisse interdum consectetur libero id faucibus. Diam phasellus
-		vestibulum lorem sed risus ultricies tristique. Rhoncus dolor purus non enim praesent elementum
-		facilisis. Ultrices tincidunt arcu non sodales neque. Tempus egestas sed sed risus pretium quam
-		vulputate. Viverra suspendisse potenti nullam ac tortor vitae purus faucibus ornare. Fringilla
-		urna porttitor rhoncus dolor purus non. Amet dictum sit amet justo donec enim.
-	</p>
+	<section class="sec sec--brand" aria-labelledby="h-kg">
+		<div class="wrap space">
+			<div class="space__text reveal">
+				<p class="eyebrow">Không gian</p>
+				<h2 id="h-kg">Hai tầng, đủ chỗ cho bữa trưa nhanh lẫn buổi liên hoan</h2>
+				<p>
+					Tầng 1 hợp nhóm nhỏ và bữa trưa văn phòng. Tầng 2 ghép được dãy bàn dài cho nhóm 24 đến 30
+					người ngồi liền nhau.
+				</p>
+				<p>Đoàn đông, sinh nhật, liên hoan công ty: anh chị gọi trước để quán xếp bàn cho gọn.</p>
+				<a class="btn btn--light" href={HOTLINE_TEL}>Gọi {HOTLINE}</a>
+			</div>
+			<ul class="stats reveal">
+				<li><strong>2</strong><span>tầng</span></li>
+				<li><strong>19</strong><span>bàn</span></li>
+				<li><strong>76</strong><span>chỗ ngồi</span></li>
+				<li><strong>24-30</strong><span>khách một dãy dài</span></li>
+			</ul>
+		</div>
+	</section>
 
-	<p>
-		Mattis ullamcorper velit sed ullamcorper morbi tincidunt. Tortor posuere ac ut consequat semper
-		viverra. Tellus mauris a diam maecenas sed enim ut sem viverra. Venenatis urna cursus eget nunc
-		scelerisque viverra mauris in. Arcu ac tortor dignissim convallis aenean et tortor at. Curabitur
-		gravida arcu ac tortor dignissim convallis aenean et tortor. Egestas tellus rutrum tellus
-		pellentesque eu. Fusce ut placerat orci nulla pellentesque dignissim enim sit amet. Ut enim
-		blandit volutpat maecenas volutpat blandit aliquam etiam. Id donec ultrices tincidunt arcu. Id
-		cursus metus aliquam eleifend mi.
-	</p>
-
-	<p>
-		Tempus quam pellentesque nec nam aliquam sem. Risus at ultrices mi tempus imperdiet. Id porta
-		nibh venenatis cras sed felis eget velit. Ipsum a arcu cursus vitae. Facilisis magna etiam
-		tempor orci eu lobortis elementum. Tincidunt dui ut ornare lectus sit. Quisque non tellus orci
-		ac. Blandit libero volutpat sed cras. Nec tincidunt praesent semper feugiat nibh sed pulvinar
-		proin gravida. Egestas integer eget aliquet nibh praesent tristique magna.
-	</p>
-</Layout>
+	<section class="sec" aria-labelledby="h-ghe">
+		<div class="wrap">
+			<div class="sec__head">
+				<p class="eyebrow">Ghé quán</p>
+				<h2 id="h-ghe">Cuốn Sinh ở đâu, mở lúc nào?</h2>
+			</div>
+			<ul class="contacts contacts--3">
+				<li class="contact reveal">
+					<h3>Địa chỉ</h3>
+					<p>Số 3, ngõ 58 Vũ Trọng Phụng, Thanh Xuân, Hà Nội</p>
+					<a class="link" href={MAPS_URL} target="_blank" rel="noopener">Chỉ đường trên Google Maps</a>
+				</li>
+				<li class="contact reveal">
+					<h3>Giờ nhận khách</h3>
+					<p>Ca trưa 9:00 - 14:00<br />Ca tối 16:30 - 22:00</p>
+				</li>
+				<li class="contact reveal">
+					<h3>Đặt bàn, hỏi món</h3>
+					<p><a class="big" href={HOTLINE_TEL}>{HOTLINE}</a></p>
+					<a class="link" href="/#dat-ban">Đặt bàn trực tuyến</a>
+				</li>
+			</ul>
+		</div>
+	</section>
+</Base>

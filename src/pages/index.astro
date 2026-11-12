@@ -1,31 +1,10 @@
 ---
-// Trang chủ Cuốn Sinh. Script giao diện sáng/tối được nhúng thẳng vào <head>
-// để chạy trước khi trang vẽ (không nháy màu); logic nằm ở src/scripts/theme.cjs.
-import themeScript from "../scripts/theme.cjs?raw";
+// Trang chủ Cuốn Sinh. Đầu trang, chân trang và giao diện sáng/tối nằm ở khung chung Base.astro.
+import Base from '../layouts/Base.astro';
 ---
 
-<!doctype html>
-<html lang="vi" data-theme="light">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cuốn Sinh - Tươi ngon mỗi cuốn, ấm áp mỗi bữa</title>
-<meta name="description" content="Nhà hàng Cuốn Sinh: món cuốn, lẩu và món Việt chia sẻ tại Số 3, ngõ 58 Vũ Trọng Phụng, Thanh Xuân, Hà Nội. Đặt bàn: 0844 566 922.">
-<meta name="theme-color" content="#fbf8f1">
-<link rel="canonical" href="https://cuonsinh.com/">
-<meta property="og:type" content="restaurant">
-<meta property="og:locale" content="vi_VN">
-<meta property="og:title" content="Cuốn Sinh - Tươi ngon mỗi cuốn, ấm áp mỗi bữa">
-<meta property="og:description" content="Món cuốn, lẩu và món Việt để cả nhà, cả nhóm cùng chia sẻ. Số 3, ngõ 58 Vũ Trọng Phụng, Thanh Xuân, Hà Nội.">
-<meta property="og:url" content="https://cuonsinh.com/">
-<meta property="og:image" content="https://cuonsinh.com/assets/img/lau-cua-song-sieu-gach.webp">
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<!-- Đặt giao diện sáng/tối TRƯỚC khi trang vẽ ra để không nháy màu -->
-<script is:inline set:html={themeScript}></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/site.css">
+<Base ogType="restaurant">
+<Fragment slot="head">
 <link rel="preload" as="image" href="/assets/img/set-cuon-tong-hop.webp" fetchpriority="high">
 <script is:inline type="application/ld+json">
 {
@@ -49,40 +28,7 @@ import themeScript from "../scripts/theme.cjs?raw";
   "sameAs": ["https://www.facebook.com/nhahangcuonsinh"]
 }
 </script>
-</head>
-<body>
-<a class="skip" href="#noi-dung">Bỏ qua, tới nội dung chính</a>
-
-<!-- ============ THANH ĐẦU TRANG ============ -->
-<header class="top" id="dau-trang">
-  <div class="wrap top__in">
-    <a class="logo" href="#dau-trang" aria-label="Cuốn Sinh - về đầu trang">
-      <img src="/assets/logo-cuon-sinh.png" alt="Cuốn Sinh" width="640" height="243">
-    </a>
-
-    <nav class="nav" id="menu-chinh" aria-label="Điều hướng chính">
-      <a href="#mon-noi-bat">Thực đơn</a>
-      <a href="#combo">Combo</a>
-      <a href="#khong-gian">Không gian</a>
-      <a href="#lien-he">Liên hệ</a>
-      <a class="nav__cta" href="#dat-ban">Đặt bàn</a>
-    </nav>
-
-    <div class="top__tools">
-      <a class="btn btn--primary btn--sm top__book" href="#dat-ban">Đặt bàn</a>
-      <button class="icon-btn menu-btn" type="button" aria-controls="menu-chinh" aria-expanded="false" aria-label="Mở menu">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path class="menu-btn__a" d="M4 7h16M4 12h16M4 17h16"/><path class="menu-btn__b" d="M6 6l12 12M18 6L6 18"/></svg>
-      </button>
-      <!-- Nút đổi giao diện: luôn ở góc trên bên phải -->
-      <button class="icon-btn theme-btn" type="button" id="nut-giao-dien" aria-label="Đổi giao diện sáng tối" title="Đổi giao diện sáng/tối">
-        <svg class="theme-btn__sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M18.7 5.3L17 7M7 17l-1.7 1.7"/></svg>
-        <svg class="theme-btn__moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.2 8.2 0 1 0 10.2 10.2z"/></svg>
-      </button>
-    </div>
-  </div>
-</header>
-
-<main id="noi-dung">
+</Fragment>
 
 <!-- ============ 1. HERO ============ -->
 <section class="hero">
@@ -441,32 +387,4 @@ import themeScript from "../scripts/theme.cjs?raw";
   </div>
 </section>
 
-</main>
-
-<!-- ============ CHÂN TRANG ============ -->
-<footer class="foot">
-  <div class="wrap foot__in">
-    <div>
-      <img class="foot__logo" src="/assets/logo-cuon-sinh.png" alt="Cuốn Sinh" width="640" height="243" loading="lazy">
-      <p>Tươi ngon mỗi cuốn, ấm áp mỗi bữa.</p>
-    </div>
-    <nav class="foot__links" aria-label="Chính sách">
-      <a href="/dieu-khoan-dich-vu/">Điều khoản dịch vụ</a>
-      <a href="/chinh-sach-bao-mat/">Chính sách bảo mật</a>
-      <a href="/xoa-du-lieu/">Hướng dẫn xoá dữ liệu</a>
-    </nav>
-    <p class="foot__copy">© 2026 Nhà hàng Cuốn Sinh</p>
-  </div>
-</footer>
-
-<!-- Thanh thao tác nhanh trên điện thoại -->
-<nav class="dock" aria-label="Thao tác nhanh">
-  <a href="tel:0844566922"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 4h3l1.5 4-2 1.5a11 11 0 0 0 5.5 5.5l1.5-2 4 1.5v3A2.5 2.5 0 0 1 17.5 20 13.5 13.5 0 0 1 4 6.500 2.500 2.500 0 0 1 6.500 4z"/></svg>Gọi</a>
-  <a href="https://m.me/nhahangcuonsinh" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.500h16v11H9.500L5 20v-3.500H4z"/></svg>Nhắn tin</a>
-  <a href="https://www.google.com/maps/search/?api=1&amp;query=Nh%C3%A0+h%C3%A0ng+Cu%E1%BB%91n+Sinh%2C+S%E1%BB%91+3+ng%C3%B5+58+V%C5%A9+Tr%E1%BB%8Dng+Ph%E1%BB%A5ng%2C+Thanh+Xu%C3%A2n%2C+H%C3%A0+N%E1%BB%99i" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.500-6-6.500-11a6.500 6.500 0 0 1 13 0c0 5-6.500 11-6.500 11z"/><circle cx="12" cy="10" r="2.300"/></svg>Chỉ đường</a>
-  <a class="dock__main" href="#dat-ban"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6.500h14v13H5zM5 10.500h14M9 4v4M15 4v4"/></svg>Đặt bàn</a>
-</nav>
-
-<script is:inline src="/assets/js/site.js" defer></script>
-</body>
-</html>
+</Base>
