@@ -2,7 +2,7 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { autoTheme, nextSwitch, resolveTheme, manualRecord } = require("../assets/js/theme.js");
+const { autoTheme, nextSwitch, resolveTheme, manualRecord } = require("../src/scripts/theme.cjs");
 
 // Ngày dựng bằng giờ ĐỊA PHƯƠNG, đúng như trình duyệt của người truy cập.
 const at = (h, m = 0) => new Date(2026, 10, 12, h, m, 0, 0);

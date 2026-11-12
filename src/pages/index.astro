@@ -1,3 +1,9 @@
+---
+// Trang chủ Cuốn Sinh. Script giao diện sáng/tối được nhúng thẳng vào <head>
+// để chạy trước khi trang vẽ (không nháy màu); logic nằm ở src/scripts/theme.cjs.
+import themeScript from "../scripts/theme.cjs?raw";
+---
+
 <!doctype html>
 <html lang="vi" data-theme="light">
 <head>
@@ -13,15 +19,15 @@
 <meta property="og:description" content="Món cuốn, lẩu và món Việt để cả nhà, cả nhóm cùng chia sẻ. Số 3, ngõ 58 Vũ Trọng Phụng, Thanh Xuân, Hà Nội.">
 <meta property="og:url" content="https://cuonsinh.com/">
 <meta property="og:image" content="https://cuonsinh.com/assets/img/lau-cua-song-sieu-gach.webp">
-<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <!-- Đặt giao diện sáng/tối TRƯỚC khi trang vẽ ra để không nháy màu -->
-<script src="assets/js/theme.js"></script>
+<script is:inline set:html={themeScript}></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/site.css">
-<link rel="preload" as="image" href="assets/img/set-cuon-tong-hop.webp" fetchpriority="high">
-<script type="application/ld+json">
+<link rel="stylesheet" href="/assets/css/site.css">
+<link rel="preload" as="image" href="/assets/img/set-cuon-tong-hop.webp" fetchpriority="high">
+<script is:inline type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "Restaurant",
@@ -51,7 +57,7 @@
 <header class="top" id="dau-trang">
   <div class="wrap top__in">
     <a class="logo" href="#dau-trang" aria-label="Cuốn Sinh - về đầu trang">
-      <img src="assets/logo-cuon-sinh.png" alt="Cuốn Sinh" width="640" height="243">
+      <img src="/assets/logo-cuon-sinh.png" alt="Cuốn Sinh" width="640" height="243">
     </a>
 
     <nav class="nav" id="menu-chinh" aria-label="Điều hướng chính">
@@ -92,7 +98,7 @@
       <p class="open" id="trang-thai-mo" hidden><span class="open__dot" aria-hidden="true"></span><span class="open__txt"></span></p>
     </div>
     <div class="hero__media">
-      <img src="assets/img/set-cuon-tong-hop.webp" alt="Set cuốn tổng hợp của Cuốn Sinh với bánh tráng, rau sống, nem lụi và thịt" width="667" height="1000" fetchpriority="high">
+      <img src="/assets/img/set-cuon-tong-hop.webp" alt="Set cuốn tổng hợp của Cuốn Sinh với bánh tráng, rau sống, nem lụi và thịt" width="667" height="1000" fetchpriority="high">
       <div class="hero__tag">
         <strong>Set cuốn tổng hợp</strong>
         <span>288.000đ</span>
@@ -161,66 +167,66 @@
 
     <ul class="dishes" id="ds-mon">
       <li class="dish" data-cat="cuon" data-hot>
-        <div class="dish__img"><img src="assets/img/set-cuon-tong-hop.webp" alt="Set cuốn tổng hợp" width="667" height="1000" loading="lazy"></div>
+        <div class="dish__img"><img src="/assets/img/set-cuon-tong-hop.webp" alt="Set cuốn tổng hợp" width="667" height="1000" loading="lazy"></div>
         <div class="dish__body"><span class="chip">Cuốn</span><h3>Set cuốn tổng hợp</h3><p class="price">288.000đ</p></div>
       </li>
       <li class="dish" data-cat="cuon" data-hot>
-        <div class="dish__img"><img src="assets/img/cuon-heo-quay-nho.webp" alt="Cuốn heo quay" width="1000" height="667" loading="lazy"></div>
+        <div class="dish__img"><img src="/assets/img/cuon-heo-quay-nho.webp" alt="Cuốn heo quay" width="1000" height="667" loading="lazy"></div>
         <div class="dish__body"><span class="chip">Cuốn</span><h3>Cuốn heo quay - nhỏ</h3><p class="price">98.000đ</p></div>
       </li>
       <li class="dish" data-cat="cuon">
-        <div class="dish__img"><img src="assets/img/cuon-nem-lui-hue.webp" alt="Set cuốn nem lụi Huế" width="1000" height="667" loading="lazy"></div>
+        <div class="dish__img"><img src="/assets/img/cuon-nem-lui-hue.webp" alt="Set cuốn nem lụi Huế" width="1000" height="667" loading="lazy"></div>
         <div class="dish__body"><span class="chip">Cuốn</span><h3>Set cuốn nem lụi Huế</h3><p class="price">129.000đ</p></div>
       </li>
       <li class="dish" data-cat="cuon">
-        <div class="dish__img"><img src="assets/img/cuon-ca-lang-nuong-rieng.webp" alt="Cuốn cá lăng nướng riềng" width="1000" height="573" loading="lazy"></div>
+        <div class="dish__img"><img src="/assets/img/cuon-ca-lang-nuong-rieng.webp" alt="Cuốn cá lăng nướng riềng" width="1000" height="573" loading="lazy"></div>
         <div class="dish__body"><span class="chip">Cuốn</span><h3>Cuốn cá lăng nướng riềng</h3><p class="price">198.000đ</p></div>
       </li>
 
       <li class="dish" data-cat="lau" data-hot>
-        <div class="dish__img"><img src="assets/img/lau-cua-song-sieu-gach.webp" alt="Lẩu cua sông siêu gạch" width="1000" height="666" loading="lazy"></div>
+        <div class="dish__img"><img src="/assets/img/lau-cua-song-sieu-gach.webp" alt="Lẩu cua sông siêu gạch" width="1000" height="666" loading="lazy"></div>
         <div class="dish__body"><span class="chip">Lẩu</span><h3>Lẩu cua sông siêu gạch</h3><p class="price">618.000đ</p></div>
       </li>
       <li class="dish" data-cat="lau" data-hot>
-        <div class="dish__img"><img src="assets/img/lau-tom-bau-a-sinh.webp" alt="Lẩu tôm bầu A Sinh" width="1000" height="669" loading="lazy"></div>
+        <div class="dish__img"><img src="/assets/img/lau-tom-bau-a-sinh.webp" alt="Lẩu tôm bầu A Sinh" width="1000" height="669" loading="lazy"></div>
         <div class="dish__body"><span class="chip">Lẩu</span><h3>Lẩu tôm bầu A Sinh</h3><p class="price">618.000đ</p></div>
       </li>
       <li class="dish" data-cat="lau">
-        <div class="dish__img"><img src="assets/img/lau-oc-sai-thanh.webp" alt="Lẩu ốc Sài Thành nồi lớn" width="667" height="1000" loading="lazy"></div>
+        <div class="dish__img"><img src="/assets/img/lau-oc-sai-thanh.webp" alt="Lẩu ốc Sài Thành nồi lớn" width="667" height="1000" loading="lazy"></div>
         <div class="dish__body"><span class="chip">Lẩu</span><h3>Lẩu ốc Sài Thành - nồi lớn</h3><p class="price">588.000đ</p></div>
       </li>
       <li class="dish" data-cat="lau">
-        <div class="dish__img"><img src="assets/img/lau-be-to-nhung-me.webp" alt="Lẩu bê tơ nhúng mẻ" width="685" height="1000" loading="lazy"></div>
+        <div class="dish__img"><img src="/assets/img/lau-be-to-nhung-me.webp" alt="Lẩu bê tơ nhúng mẻ" width="685" height="1000" loading="lazy"></div>
         <div class="dish__body"><span class="chip">Lẩu</span><h3>Lẩu bê tơ nhúng mẻ</h3><p class="price">468.000đ</p></div>
       </li>
 
       <li class="dish" data-cat="chinh" data-hot>
-        <div class="dish__img"><img src="assets/img/ga-ta-chien-mam-sai-gon.webp" alt="Gà ta chiên mắm Sài Gòn" width="986" height="1000" loading="lazy"></div>
+        <div class="dish__img"><img src="/assets/img/ga-ta-chien-mam-sai-gon.webp" alt="Gà ta chiên mắm Sài Gòn" width="986" height="1000" loading="lazy"></div>
         <div class="dish__body"><span class="chip">Món chính</span><h3>Gà ta chiên mắm Sài Gòn</h3><p class="price">198.000đ</p></div>
       </li>
       <li class="dish" data-cat="chinh" data-hot>
-        <div class="dish__img"><img src="assets/img/bo-sot-tieu-xanh-ban-gang.webp" alt="Bò sốt tiêu xanh bản gang" width="1000" height="651" loading="lazy"></div>
+        <div class="dish__img"><img src="/assets/img/bo-sot-tieu-xanh-ban-gang.webp" alt="Bò sốt tiêu xanh bản gang" width="1000" height="651" loading="lazy"></div>
         <div class="dish__body"><span class="chip">Món chính</span><h3>Bò sốt tiêu xanh bản gang</h3><p class="price">198.000đ</p></div>
       </li>
       <li class="dish" data-cat="chinh">
-        <div class="dish__img"><img src="assets/img/nong-heo-chien-la-moc-mat.webp" alt="Nọng heo chiên lá móc mật" width="1000" height="666" loading="lazy"></div>
+        <div class="dish__img"><img src="/assets/img/nong-heo-chien-la-moc-mat.webp" alt="Nọng heo chiên lá móc mật" width="1000" height="666" loading="lazy"></div>
         <div class="dish__body"><span class="chip">Món chính</span><h3>Nọng heo chiên lá móc mật</h3><p class="price">188.000đ</p></div>
       </li>
       <li class="dish" data-cat="chinh">
-        <div class="dish__img"><img src="assets/img/cha-oc-boc-giay-bac.webp" alt="Chả ốc bọc giấy bạc" width="1000" height="869" loading="lazy"></div>
+        <div class="dish__img"><img src="/assets/img/cha-oc-boc-giay-bac.webp" alt="Chả ốc bọc giấy bạc" width="1000" height="869" loading="lazy"></div>
         <div class="dish__body"><span class="chip">Món chính</span><h3>Chả ốc bọc giấy bạc</h3><p class="price">156.000đ</p></div>
       </li>
 
       <li class="dish" data-cat="goi" data-hot>
-        <div class="dish__img"><img src="assets/img/goi-bo-keo-phao.webp" alt="Gỏi bò kéo pháo" width="980" height="1000" loading="lazy"></div>
+        <div class="dish__img"><img src="/assets/img/goi-bo-keo-phao.webp" alt="Gỏi bò kéo pháo" width="980" height="1000" loading="lazy"></div>
         <div class="dish__body"><span class="chip">Gỏi, nộm</span><h3>Gỏi bò kéo pháo</h3><p class="price">138.000đ</p></div>
       </li>
       <li class="dish" data-cat="goi" data-hot>
-        <div class="dish__img"><img src="assets/img/nom-rau-cang-cua-bap-bo.webp" alt="Nộm rau càng cua bắp bò" width="1000" height="861" loading="lazy"></div>
+        <div class="dish__img"><img src="/assets/img/nom-rau-cang-cua-bap-bo.webp" alt="Nộm rau càng cua bắp bò" width="1000" height="861" loading="lazy"></div>
         <div class="dish__body"><span class="chip">Gỏi, nộm</span><h3>Nộm rau càng cua bắp bò</h3><p class="price">138.000đ</p></div>
       </li>
       <li class="dish" data-cat="goi">
-        <div class="dish__img"><img src="assets/img/goi-buoi-tom-thit.webp" alt="Gỏi bưởi tôm thịt" width="974" height="1000" loading="lazy"></div>
+        <div class="dish__img"><img src="/assets/img/goi-buoi-tom-thit.webp" alt="Gỏi bưởi tôm thịt" width="974" height="1000" loading="lazy"></div>
         <div class="dish__body"><span class="chip">Gỏi, nộm</span><h3>Gỏi bưởi tôm thịt</h3><p class="price">148.000đ</p></div>
       </li>
     </ul>
@@ -441,7 +447,7 @@
 <footer class="foot">
   <div class="wrap foot__in">
     <div>
-      <img class="foot__logo" src="assets/logo-cuon-sinh.png" alt="Cuốn Sinh" width="640" height="243" loading="lazy">
+      <img class="foot__logo" src="/assets/logo-cuon-sinh.png" alt="Cuốn Sinh" width="640" height="243" loading="lazy">
       <p>Tươi ngon mỗi cuốn, ấm áp mỗi bữa.</p>
     </div>
     <nav class="foot__links" aria-label="Chính sách">
@@ -461,6 +467,6 @@
   <a class="dock__main" href="#dat-ban"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6.500h14v13H5zM5 10.500h14M9 4v4M15 4v4"/></svg>Đặt bàn</a>
 </nav>
 
-<script src="assets/js/site.js" defer></script>
+<script is:inline src="/assets/js/site.js" defer></script>
 </body>
 </html>

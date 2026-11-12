@@ -1,7 +1,7 @@
 /* ==========================================================================
    Cuốn Sinh - trang chủ
    Thiết kế phẳng, tối giản: màu đặc, viền mảnh, không đổ bóng, không gradient.
-   Hai giao diện: [data-theme="light"] và [data-theme="dark"] (xem assets/js/theme.js).
+   Hai giao diện: [data-theme="light"] và [data-theme="dark"] (xem src/scripts/theme.cjs).
    ========================================================================== */
 
 :root {
