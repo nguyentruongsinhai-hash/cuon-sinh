@@ -307,6 +307,55 @@ button { cursor: pointer; }
 /* ---------- Thanh thao tác nhanh trên điện thoại ---------- */
 .dock { display: none; }
 
+/* ---------- Cụm nút liên hệ nổi ở góc phải: Zalo, hotline, Messenger ---------- */
+.lien-he {
+  position: fixed; right: 20px; bottom: 24px; z-index: 35;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.lien-he__nut {
+  position: relative; width: 54px; height: 54px;
+  display: grid; place-items: center;
+  border: 2px solid var(--bg); border-radius: 50%;
+  color: #fff; text-decoration: none;
+  transition: transform .15s ease;
+}
+.lien-he__nut:hover { transform: scale(1.08); }
+.lien-he__nut:active { transform: scale(.96); }
+.lien-he__nut svg { width: 26px; height: 26px; fill: currentColor; }
+.lien-he__nut--zalo { background: #0068ff; }
+.lien-he__nut--goi { background: var(--primary); color: var(--on-primary); }
+.lien-he__nut--mess { background: #a033ff; }
+.lien-he__zalo { font-size: .8125rem; font-weight: 800; letter-spacing: -.01em; line-height: 1; }
+.lien-he__nut--goi svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.lien-he__nut--mess .lien-he__tia { fill: #a033ff; }
+
+/* Vòng lan quanh nút gọi để khách nhìn ra ngay số hotline */
+.lien-he__nut--goi::after {
+  content: ""; position: absolute; inset: -2px; border-radius: 50%;
+  border: 2px solid var(--primary); opacity: 0; pointer-events: none;
+  animation: lien-he-lan 2.2s ease-out infinite;
+}
+@keyframes lien-he-lan {
+  0% { transform: scale(1); opacity: .7; }
+  70%, 100% { transform: scale(1.55); opacity: 0; }
+}
+
+/* Nhãn chữ hiện bên trái khi rê chuột hoặc tab tới */
+.lien-he__nhan {
+  position: absolute; right: calc(100% + 10px); top: 50%;
+  padding: 6px 12px; border-radius: 999px;
+  background: var(--text); color: var(--bg);
+  font-size: .8125rem; font-weight: 600; line-height: 1.4; white-space: nowrap;
+  opacity: 0; visibility: hidden; transform: translate(6px, -50%);
+  transition: opacity .15s ease, transform .15s ease, visibility 0s linear .15s;
+  pointer-events: none;
+}
+.lien-he__nut:hover .lien-he__nhan, .lien-he__nut:focus-visible .lien-he__nhan {
+  opacity: 1; visibility: visible; transform: translate(0, -50%); transition-delay: 0s;
+}
+@media (hover: none) { .lien-he__nhan { display: none; } }
+@media print { .lien-he, .dock { display: none !important; } }
+
 /* ---------- Hiện dần khi cuộn tới (chỉ khi có JS) ---------- */
 .js .reveal { opacity: 0; transform: translateY(18px); transition: opacity .5s ease, transform .5s ease; }
 .js .reveal.is-seen { opacity: 1; transform: none; }
@@ -369,6 +418,12 @@ button { cursor: pointer; }
   .dock svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
   .dock .dock__main { background: var(--primary); color: var(--on-primary); }
   body { padding-bottom: calc(60px + env(safe-area-inset-bottom)); }
+
+  /* Cụm nút nổi nằm ngay trên thanh thao tác, nhỏ lại cho đỡ che nội dung */
+  .lien-he { right: 12px; bottom: calc(60px + env(safe-area-inset-bottom) + 12px); gap: 10px; }
+  .lien-he__nut { width: 48px; height: 48px; }
+  .lien-he__nut svg { width: 23px; height: 23px; }
+  .lien-he__zalo { font-size: .75rem; }
 }
 
 @media (max-width: 520px) {
@@ -441,6 +496,7 @@ button { cursor: pointer; }
 .prose table { display: block; width: 100%; overflow-x: auto; border-collapse: collapse; }
 .prose th, .prose td { padding: 12px 16px; border-bottom: 1px solid var(--line); text-align: left; }
 .prose th { color: var(--muted); font-size: .875rem; font-weight: 700; }
+.prose .the { padding: 16px 20px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); }
 
 .cta-box { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-top: 56px; padding: 28px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
 .cta-box h2 { font-size: 1.375rem; font-weight: 700; }
