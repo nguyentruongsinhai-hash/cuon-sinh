@@ -34,10 +34,34 @@
   window.addEventListener("scroll", khiCuon, { passive: true });
   khiCuon();
 
+  // Mục "Thực đơn": máy tính rê chuột là sổ (CSS lo), điện thoại bấm mũi tên để mở các nhóm món
+  const mucTD = $(".nav__item", nav);
+  const nutTD = mucTD && $(".nav__more", mucTD);
+  function datNhom(mo) {
+    if (!nutTD) return;
+    mucTD.classList.toggle("is-open", mo);
+    nutTD.setAttribute("aria-expanded", String(mo));
+    nutTD.setAttribute("aria-label", mo ? "Thu gọn các nhóm món" : "Mở các nhóm món");
+  }
+  if (nutTD) {
+    nutTD.addEventListener("click", () => datNhom(!mucTD.classList.contains("is-open")));
+    // Bấm một nhóm xong thì bảng thu lại ngay, kể cả khi đang đứng ở chính trang thực đơn
+    // (trang không tải lại nên chuột vẫn nằm trên bảng). Rời chuột hoặc Tab vào lại thì mở như cũ.
+    $(".sub", mucTD).addEventListener("click", (e) => {
+      const a = e.target.closest("a");
+      if (!a) return;
+      a.blur();
+      mucTD.classList.add("is-shut");
+    });
+    mucTD.addEventListener("mouseleave", () => mucTD.classList.remove("is-shut"));
+    mucTD.addEventListener("focusin", () => mucTD.classList.remove("is-shut"));
+  }
+
   function datMenu(mo) {
     nav.classList.toggle("is-open", mo);
     nutMenu.setAttribute("aria-expanded", String(mo));
     nutMenu.setAttribute("aria-label", mo ? "Đóng menu" : "Mở menu");
+    if (!mo) datNhom(false);
   }
   nutMenu.addEventListener("click", () => datMenu(!nav.classList.contains("is-open")));
   nav.addEventListener("click", (e) => { if (e.target.closest("a")) datMenu(false); });
@@ -93,6 +117,16 @@
   boLoc(".tab", ".dish", (m, n) => (n.dataset.cat === "hot" ? m.hasAttribute("data-hot") : m.dataset.cat === n.dataset.cat));
   boLoc(".people__btn", ".combo", (m, n) => m.dataset.people === n.dataset.people);
 
+  // Nút dưới lưới món (id xem-them-mon): chữ và đích đổi theo nhóm đang chọn,
+  // ví dụ đang ở tab Lẩu thì thành "Xem thêm lẩu" và dẫn tới /thuc-don/#lau
+  const nutThem = $("#xem-them-mon");
+  if (nutThem) {
+    $$(".tab").forEach((b) => b.addEventListener("click", () => {
+      nutThem.href = b.dataset.themHref || "/thuc-don/";
+      nutThem.textContent = b.dataset.themChu || "Xem thực đơn đầy đủ";
+    }));
+  }
+
   // Giá chia đầu người, làm tròn nghìn, tính từ giá đang in trên thẻ combo
   $$(".combo").forEach((c) => {
     const gia = parseInt($(".combo__price", c).textContent.replace(/\D/g, ""), 10);
@@ -129,6 +163,24 @@
       });
     }, { rootMargin: "-45% 0px -50% 0px" });
     khoi.forEach((k) => io2.observe(k));
+  }
+
+  /* ---------- Trang thực đơn: tô nhóm đang xem trên thanh nhóm món ---------- */
+  const thanhNhom = $("#nhom-mon");
+  if (thanhNhom && "IntersectionObserver" in window) {
+    const the = $$(".mnav__a", thanhNhom);
+    const toNhom = (id) => the.forEach((a) => {
+      const on = a.getAttribute("href") === "#" + id;
+      a.classList.toggle("is-on", on);
+      if (!on) { a.removeAttribute("aria-current"); return; }
+      a.setAttribute("aria-current", "true");
+      // Giữ thẻ đang chọn nằm giữa thanh (chỉ cuộn ngang thanh, không đụng tới trang)
+      thanhNhom.scrollTo({ left: a.offsetLeft - (thanhNhom.clientWidth - a.offsetWidth) / 2 });
+    });
+    const io3 = new IntersectionObserver((es) => {
+      es.forEach((e) => { if (e.isIntersecting) toNhom(e.target.id); });
+    }, { rootMargin: "-25% 0px -74% 0px" });
+    $$(".mgroup").forEach((g) => io3.observe(g));
   }
 
   /* ---------- Form đặt bàn (cùng API /api/dat-ban với trang /dat-ban/) ---------- */
@@ -190,6 +242,12 @@
     const gc = form.elements.ghi_chu;
     if (!gc.value.includes(a.dataset.ghiChu)) gc.value = (gc.value ? gc.value.trim() + ". " : "") + "Gọi " + a.dataset.ghiChu;
   }));
+
+  // Từ trang thực đơn bấm "Đặt bàn với combo này": số người và ghi chú đi theo địa chỉ
+  // (/dat-ban/?so_nguoi=4&ghi_chu=...) nên điền sẵn vào form
+  const tuDiaChi = new URLSearchParams(window.location.search);
+  if (tuDiaChi.get("so_nguoi")) oNguoi.value = kep(parseInt(tuDiaChi.get("so_nguoi"), 10));
+  if (tuDiaChi.get("ghi_chu")) form.elements.ghi_chu.value = tuDiaChi.get("ghi_chu").slice(0, 500);
 
   function bao(loai, chu) {
     kq.className = "form__msg" + (loai ? " is-" + loai : "");

@@ -5,6 +5,8 @@ export const SITE_DESCRIPTION =
 	'Nhà hàng Cuốn Sinh: món cuốn, lẩu và món Việt chia sẻ tại Số 3, ngõ 58 Vũ Trọng Phụng, Thanh Xuân, Hà Nội. Đặt bàn: 0844 566 922.';
 export const HOTLINE = '0844 566 922';
 export const HOTLINE_TEL = 'tel:0844566922';
+// Zalo của quán đăng ký bằng chính số hotline: link này mở thẳng khung chat.
+export const ZALO_URL = 'https://zalo.me/0844566922';
 export const MESSENGER_URL = 'https://m.me/nhahangcuonsinh';
 export const FACEBOOK_URL = 'https://www.facebook.com/nhahangcuonsinh';
 export const MAPS_URL =

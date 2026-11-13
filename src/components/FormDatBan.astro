@@ -1,0 +1,44 @@
+---
+// Form đặt bàn dùng chung cho trang chủ (mục #dat-ban) và trang /dat-ban/.
+// Logic nằm ở public/assets/js/site.js: tìm #form-dat-ban rồi gửi tới /api/dat-ban.
+// Mỗi trang chỉ đặt MỘT form này (id cố định).
+---
+
+<form class="form reveal" id="form-dat-ban" novalidate>
+  <div class="field">
+    <label for="f-ten">Họ tên</label>
+    <input id="f-ten" name="ho_ten" autocomplete="name" required maxlength="80">
+  </div>
+  <div class="field">
+    <label for="f-sdt">Số điện thoại</label>
+    <input id="f-sdt" name="sdt" type="tel" inputmode="tel" autocomplete="tel" required placeholder="09xx xxx xxx">
+  </div>
+  <div class="field-row">
+    <div class="field">
+      <label for="f-ngay">Ngày đến</label>
+      <input id="f-ngay" name="ngay" type="date" required>
+    </div>
+    <div class="field">
+      <label for="f-gio">Giờ đến</label>
+      <select id="f-gio" name="gio" required></select>
+    </div>
+  </div>
+  <div class="field">
+    <label for="f-nguoi">Số người</label>
+    <div class="stepper">
+      <button type="button" class="stepper__btn" data-step="-1" aria-label="Bớt một người">−</button>
+      <input id="f-nguoi" name="so_nguoi" type="number" inputmode="numeric" min="1" max="60" value="2" required>
+      <button type="button" class="stepper__btn" data-step="1" aria-label="Thêm một người">+</button>
+    </div>
+  </div>
+  <div class="field">
+    <label for="f-ghi-chu">Ghi chú <span class="opt">(không bắt buộc)</span></label>
+    <textarea id="f-ghi-chu" name="ghi_chu" rows="3" maxlength="500" placeholder="Sinh nhật, cần ghế trẻ em, muốn ngồi tầng 2..."></textarea>
+  </div>
+  <!-- bẫy bot: người thật không thấy ô này -->
+  <input name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+  <button class="btn btn--primary btn--lg btn--block" type="submit">Gửi đặt bàn</button>
+  <p class="form__hint">Quán nhận khách 9:00-14:00 và 16:30-22:00. Đặt trong ngày vui lòng đặt trước ít nhất 60 phút.</p>
+  <p class="form__msg" id="ket-qua" role="status" aria-live="polite"></p>
+  <noscript><p class="form__msg is-err">Trình duyệt đang tắt JavaScript. Anh chị gọi 0844 566 922 để đặt bàn nhé.</p></noscript>
+</form>

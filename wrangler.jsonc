@@ -4,15 +4,24 @@
 	"compatibility_flags": ["global_fetch_strictly_public"],
 	"name": "cuon-sinh",
 	"main": "@astrojs/cloudflare/entrypoints/server",
+	// Giữ địa chỉ *.workers.dev và link xem thử từng bản: có `routes` mà thiếu hai
+	// dòng này thì wrangler tự tắt cả hai, mất chỗ kiểm tra khi tên miền trục trặc.
+	"workers_dev": true,
+	"preview_urls": true,
+	// Tên miền thật gắn bằng ROUTE (Worker đứng trước bản ghi DNS sẵn có), không phải
+	// custom domain: bản ghi DNS cũ của cuonsinh.com và www (thời còn chạy Pages) vẫn
+	// còn, nên Cloudflare từ chối tạo custom domain (lỗi 100117). Muốn đổi sang custom
+	// domain thì xoá hai bản ghi đó trong DNS trước. Còn dùng route thì ĐỪNG xoá chúng:
+	// route cần một bản ghi DNS bật proxy mới nhận được khách.
+	"routes": [
+		{ "pattern": "cuonsinh.com/*", "zone_name": "cuonsinh.com" },
+		{ "pattern": "www.cuonsinh.com/*", "zone_name": "cuonsinh.com" }
+	],
 	"assets": {
 		"directory": "./dist",
 		"binding": "ASSETS"
 	},
 	"observability": {
 		"enabled": true
-	},
-	// Giữ địa chỉ thử workers.dev và địa chỉ xem thử của nhánh luôn bật.
-	// Thiếu hai dòng này, hễ thêm "routes" là wrangler tự tắt cả hai.
-	"workers_dev": true,
-	"preview_urls": true
+	}
 }

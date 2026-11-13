@@ -5,6 +5,7 @@
 import Dock from '../components/Dock.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
+import LienHeNoi from '../components/LienHeNoi.astro';
 import { DEFAULT_OG_IMAGE, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE } from '../consts';
 import themeScript from '../scripts/theme.cjs?raw';
 
@@ -62,6 +63,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 			<slot />
 		</main>
 		<Footer />
+		<LienHeNoi />
 		<Dock />
 		<script is:inline src="/assets/js/site.js" defer></script>
 	</body>

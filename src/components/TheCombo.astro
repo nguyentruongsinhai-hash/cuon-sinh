@@ -1,0 +1,60 @@
+---
+// Thẻ một combo: ảnh mâm (nếu có), số người, tên, giá, các món. Trang chủ có
+// form đặt bàn ngay trong trang nên nút cuộn tới #dat-ban và site.js điền sẵn
+// số người, ghi chú (data-ghi-chu). Ở trang khác nút dẫn sang /dat-ban/ kèm
+// sẵn hai thông tin đó trên địa chỉ.
+import { giaVN } from '../data/thuc-don.mjs';
+
+interface Props {
+	combo: {
+		ten: string;
+		gia: number;
+		nguoi: number;
+		coLau?: boolean;
+		gom: string[];
+		anh?: { file: string; w: number; h: number };
+	};
+	/** true khi trang đang đứng có sẵn form đặt bàn (trang chủ) */
+	coForm?: boolean;
+}
+
+const { combo: c, coForm = false } = Astro.props;
+const nhan = `${c.ten} (${c.nguoi} người)`;
+const sangTrangDatBan = `/dat-ban/?so_nguoi=${c.nguoi}&ghi_chu=${encodeURIComponent('Gọi ' + nhan)}`;
+---
+
+<li class:list={['combo', c.coLau && 'combo--lau']} data-people={c.nguoi}>
+	{
+		c.anh && (
+			<div class="combo__img">
+				<img
+					src={'/assets/img/' + c.anh.file}
+					alt={`Mâm ${c.ten} cho ${c.nguoi} người`}
+					width={c.anh.w}
+					height={c.anh.h}
+					loading="lazy"
+					decoding="async"
+				/>
+			</div>
+		)
+	}
+	<div class="combo__body">
+		<p class="combo__for">{c.nguoi} người{c.coLau ? ' · có lẩu' : ''}</p>
+		<h3>{c.ten}</h3>
+		<p class="combo__price">{giaVN(c.gia)}</p>
+		<ul class="ticks">
+			{c.gom.map((m) => <li>{m}</li>)}
+		</ul>
+		{
+			coForm ? (
+				<a class="btn btn--ghost" href="#dat-ban" data-ghi-chu={nhan} data-so-nguoi={c.nguoi}>
+					Đặt bàn với combo này
+				</a>
+			) : (
+				<a class="btn btn--ghost" href={sangTrangDatBan}>
+					Đặt bàn với combo này
+				</a>
+			)
+		}
+	</div>
+</li>
