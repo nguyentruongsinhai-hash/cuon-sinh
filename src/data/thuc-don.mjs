@@ -129,7 +129,7 @@ export const NHOM_MON = [
 		mon: [
 			{ ten: 'Cơm chiên tôm dứa', gia: 88000, anh: anh('com-chien-tom-dua.webp', 1000, 992), top: true },
 			{ ten: 'Xôi chim trứng non đặc biệt', gia: 128000, anh: anh('xoi-chim-trung-non-dac-biet.webp', 1000, 624, { viTri: '10% 50%' }), top: true },
-			{ ten: 'Miến xào tôm nấm', gia: 138000 },
+			{ ten: 'Miến xào tôm nấm', gia: 138000, anh: anh('mien-xao-tom-nam.webp', 800, 1000, { viTri: '50% 75%' }), top: true },
 		],
 	},
 	{

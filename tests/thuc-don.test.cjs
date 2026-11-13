@@ -328,3 +328,20 @@ test("ảnh món khai điểm lấy khung để mẹt cuốn, mâm nhân lẩu k
   // Phóng dùng thuộc tính scale riêng để không đè hiệu ứng rê chuột (transform)
   assert.match(the, /scale:/);
 });
+
+// Chủ quán gửi ảnh 14/11/2026: miến xào tôm nấm đã có ảnh thật. Ảnh chụp dọc, niêu
+// miến nằm ở nửa dưới nên khung 4:3 phải lấy lệch xuống mới thấy trọn niêu.
+test("miến xào tôm nấm đã có ảnh, khung lấy trọn niêu miến và lên trang chủ", async () => {
+  const { NHOM_MON, monTrangChu } = await nap();
+  const com = NHOM_MON.find((n) => n.slug === "com-xoi");
+  const mien = com.mon.find((m) => m.ten === "Miến xào tôm nấm");
+  assert.equal(mien.anh?.file, "mien-xao-tom-nam.webp");
+  const f = path.join(ROOT, "public", "assets", "img", mien.anh.file);
+  assert.ok(fs.existsSync(f), "thiếu ảnh " + mien.anh.file);
+  assert.deepEqual(coWebp(f), { w: mien.anh.w, h: mien.anh.h }, "kích thước khai sai so với file");
+  assert.ok(fs.statSync(f).size < 300 * 1024, "ảnh miến nặng quá 300KB");
+  const y = parseFloat(mien.anh.khung.viTri.split(" ")[1]);
+  assert.ok(y >= 65 && y <= 90, "khung phải lấy phần dưới ảnh để thấy trọn niêu miến");
+  assert.ok(!mien.anh.khung.phong, "không phóng to ảnh miến");
+  assert.ok(monTrangChu(com).some((m) => m.ten === "Miến xào tôm nấm"), "miến chưa hiện ở nhóm Cơm trang chủ");
+});
