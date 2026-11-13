@@ -2,6 +2,15 @@
 // Trang chủ Cuốn Sinh. Đầu trang, chân trang và giao diện sáng/tối nằm ở khung chung Base.astro.
 import FormDatBan from '../components/FormDatBan.astro';
 import Base from '../layouts/Base.astro';
+import TheCombo from '../components/TheCombo.astro';
+import TheMon from '../components/TheMon.astro';
+import { COMBO, NHOM_MON, giaVN, monTrangChu, nhomTrangChu } from '../data/thuc-don.mjs';
+
+// Mục thực đơn: tab "Nổi bật" và mỗi nhóm tối đa 4 món, đủ món nằm ở trang /thuc-don/.
+const nhomHome = nhomTrangChu();
+const soNguoi = [...new Set(COMBO.map((c) => c.nguoi))];
+const monBia = NHOM_MON.flatMap((n) => n.mon).find((m) => m.ten === 'Set cuốn tổng hợp');
+const comboRe = COMBO.reduce((a, b) => (b.gia < a.gia ? b : a));
 ---
 
 <Base ogType="restaurant">
@@ -15,6 +24,7 @@ import Base from '../layouts/Base.astro';
   "url": "https://cuonsinh.com/",
   "telephone": "+84844566922",
   "servesCuisine": ["Món Việt", "Món cuốn", "Lẩu"],
+  "hasMenu": "https://cuonsinh.com/thuc-don/",
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "Số 3, ngõ 58 Vũ Trọng Phụng",
@@ -48,7 +58,7 @@ import Base from '../layouts/Base.astro';
       <img src="/assets/img/set-cuon-tong-hop.webp" alt="Set cuốn tổng hợp của Cuốn Sinh với bánh tráng, rau sống, nem lụi và thịt" width="667" height="1000" fetchpriority="high">
       <div class="hero__tag">
         <strong>Set cuốn tổng hợp</strong>
-        <span>288.000đ</span>
+        <span>{giaVN(monBia.gia)}</span>
       </div>
     </div>
   </div>
@@ -58,7 +68,7 @@ import Base from '../layouts/Base.astro';
       <li><strong>9:00 - 14:00</strong><span>Ca trưa</span></li>
       <li><strong>16:30 - 22:00</strong><span>Ca tối</span></li>
       <li><strong>2 tầng · 76 chỗ</strong><span>Hợp nhóm bạn, gia đình</span></li>
-      <li><strong>Từ 315.000đ</strong><span>Combo cho 2 người</span></li>
+      <li><strong>Từ {giaVN(comboRe.gia)}</strong><span>Combo cho {comboRe.nguoi} người</span></li>
     </ul>
   </div>
 </section>
@@ -104,82 +114,21 @@ import Base from '../layouts/Base.astro';
         <h2 id="h-mon">Món nên thử ở Cuốn Sinh</h2>
       </div>
       <div class="tabs" role="group" aria-label="Lọc món theo nhóm">
-        <button type="button" class="tab is-on" data-cat="hot" aria-pressed="true">Nổi bật</button>
-        <button type="button" class="tab" data-cat="cuon" aria-pressed="false">Cuốn</button>
-        <button type="button" class="tab" data-cat="lau" aria-pressed="false">Lẩu</button>
-        <button type="button" class="tab" data-cat="chinh" aria-pressed="false">Món chính</button>
-        <button type="button" class="tab" data-cat="goi" aria-pressed="false">Gỏi, nộm</button>
+        <button type="button" class="tab is-on" data-cat="hot" aria-pressed="true" data-them-href="/thuc-don/" data-them-chu="Xem thực đơn đầy đủ">Nổi bật</button>
+        {nhomHome.map((n) => (
+          <button type="button" class="tab" data-cat={n.slug} aria-pressed="false" data-them-href={'/thuc-don/#' + n.slug} data-them-chu={'Xem thêm ' + n.goiLa}>{n.ten}</button>
+        ))}
       </div>
     </div>
 
     <ul class="dishes" id="ds-mon">
-      <li class="dish" data-cat="cuon" data-hot>
-        <div class="dish__img"><img src="/assets/img/set-cuon-tong-hop.webp" alt="Set cuốn tổng hợp" width="667" height="1000" loading="lazy"></div>
-        <div class="dish__body"><span class="chip">Cuốn</span><h3>Set cuốn tổng hợp</h3><p class="price">288.000đ</p></div>
-      </li>
-      <li class="dish" data-cat="cuon" data-hot>
-        <div class="dish__img"><img src="/assets/img/cuon-heo-quay-nho.webp" alt="Cuốn heo quay" width="1000" height="667" loading="lazy"></div>
-        <div class="dish__body"><span class="chip">Cuốn</span><h3>Cuốn heo quay - nhỏ</h3><p class="price">98.000đ</p></div>
-      </li>
-      <li class="dish" data-cat="cuon">
-        <div class="dish__img"><img src="/assets/img/cuon-nem-lui-hue.webp" alt="Set cuốn nem lụi Huế" width="1000" height="667" loading="lazy"></div>
-        <div class="dish__body"><span class="chip">Cuốn</span><h3>Set cuốn nem lụi Huế</h3><p class="price">129.000đ</p></div>
-      </li>
-      <li class="dish" data-cat="cuon">
-        <div class="dish__img"><img src="/assets/img/cuon-ca-lang-nuong-rieng.webp" alt="Cuốn cá lăng nướng riềng" width="1000" height="573" loading="lazy"></div>
-        <div class="dish__body"><span class="chip">Cuốn</span><h3>Cuốn cá lăng nướng riềng</h3><p class="price">198.000đ</p></div>
-      </li>
-
-      <li class="dish" data-cat="lau" data-hot>
-        <div class="dish__img"><img src="/assets/img/lau-cua-song-sieu-gach.webp" alt="Lẩu cua sông siêu gạch" width="1000" height="666" loading="lazy"></div>
-        <div class="dish__body"><span class="chip">Lẩu</span><h3>Lẩu cua sông siêu gạch</h3><p class="price">618.000đ</p></div>
-      </li>
-      <li class="dish" data-cat="lau" data-hot>
-        <div class="dish__img"><img src="/assets/img/lau-tom-bau-a-sinh.webp" alt="Lẩu tôm bầu A Sinh" width="1000" height="669" loading="lazy"></div>
-        <div class="dish__body"><span class="chip">Lẩu</span><h3>Lẩu tôm bầu A Sinh</h3><p class="price">618.000đ</p></div>
-      </li>
-      <li class="dish" data-cat="lau">
-        <div class="dish__img"><img src="/assets/img/lau-oc-sai-thanh.webp" alt="Lẩu ốc Sài Thành nồi lớn" width="667" height="1000" loading="lazy"></div>
-        <div class="dish__body"><span class="chip">Lẩu</span><h3>Lẩu ốc Sài Thành - nồi lớn</h3><p class="price">588.000đ</p></div>
-      </li>
-      <li class="dish" data-cat="lau">
-        <div class="dish__img"><img src="/assets/img/lau-be-to-nhung-me.webp" alt="Lẩu bê tơ nhúng mẻ" width="685" height="1000" loading="lazy"></div>
-        <div class="dish__body"><span class="chip">Lẩu</span><h3>Lẩu bê tơ nhúng mẻ</h3><p class="price">468.000đ</p></div>
-      </li>
-
-      <li class="dish" data-cat="chinh" data-hot>
-        <div class="dish__img"><img src="/assets/img/ga-ta-chien-mam-sai-gon.webp" alt="Gà ta chiên mắm Sài Gòn" width="986" height="1000" loading="lazy"></div>
-        <div class="dish__body"><span class="chip">Món chính</span><h3>Gà ta chiên mắm Sài Gòn</h3><p class="price">198.000đ</p></div>
-      </li>
-      <li class="dish" data-cat="chinh" data-hot>
-        <div class="dish__img"><img src="/assets/img/bo-sot-tieu-xanh-ban-gang.webp" alt="Bò sốt tiêu xanh bản gang" width="1000" height="651" loading="lazy"></div>
-        <div class="dish__body"><span class="chip">Món chính</span><h3>Bò sốt tiêu xanh bản gang</h3><p class="price">198.000đ</p></div>
-      </li>
-      <li class="dish" data-cat="chinh">
-        <div class="dish__img"><img src="/assets/img/nong-heo-chien-la-moc-mat.webp" alt="Nọng heo chiên lá móc mật" width="1000" height="666" loading="lazy"></div>
-        <div class="dish__body"><span class="chip">Món chính</span><h3>Nọng heo chiên lá móc mật</h3><p class="price">188.000đ</p></div>
-      </li>
-      <li class="dish" data-cat="chinh">
-        <div class="dish__img"><img src="/assets/img/cha-oc-boc-giay-bac.webp" alt="Chả ốc bọc giấy bạc" width="1000" height="869" loading="lazy"></div>
-        <div class="dish__body"><span class="chip">Món chính</span><h3>Chả ốc bọc giấy bạc</h3><p class="price">156.000đ</p></div>
-      </li>
-
-      <li class="dish" data-cat="goi" data-hot>
-        <div class="dish__img"><img src="/assets/img/goi-bo-keo-phao.webp" alt="Gỏi bò kéo pháo" width="980" height="1000" loading="lazy"></div>
-        <div class="dish__body"><span class="chip">Gỏi, nộm</span><h3>Gỏi bò kéo pháo</h3><p class="price">138.000đ</p></div>
-      </li>
-      <li class="dish" data-cat="goi" data-hot>
-        <div class="dish__img"><img src="/assets/img/nom-rau-cang-cua-bap-bo.webp" alt="Nộm rau càng cua bắp bò" width="1000" height="861" loading="lazy"></div>
-        <div class="dish__body"><span class="chip">Gỏi, nộm</span><h3>Nộm rau càng cua bắp bò</h3><p class="price">138.000đ</p></div>
-      </li>
-      <li class="dish" data-cat="goi">
-        <div class="dish__img"><img src="/assets/img/goi-buoi-tom-thit.webp" alt="Gỏi bưởi tôm thịt" width="974" height="1000" loading="lazy"></div>
-        <div class="dish__body"><span class="chip">Gỏi, nộm</span><h3>Gỏi bưởi tôm thịt</h3><p class="price">148.000đ</p></div>
-      </li>
+      {nhomHome.map((n) => monTrangChu(n).map((m) => <TheMon mon={m} chip={n.ten} cat={n.slug} />))}
     </ul>
 
-    <p class="note reveal">Giá bán tại quán. Muốn xem thực đơn đầy đủ, anh chị nhắn quán qua
-      <a href="https://m.me/nhahangcuonsinh" target="_blank" rel="noopener">Messenger</a> là có ngay.</p>
+    <div class="more reveal">
+      <a class="btn btn--ghost btn--more" id="xem-them-mon" href="/thuc-don/">Xem thực đơn đầy đủ</a>
+      <p class="note">Giá bán tại quán. Ở đây mỗi nhóm chỉ hiện vài món tiêu biểu, đủ món và giá nằm ở trang <a href="/thuc-don/">Thực đơn</a>.</p>
+    </div>
   </div>
 </section>
 
@@ -193,89 +142,13 @@ import Base from '../layouts/Base.astro';
     </div>
 
     <div class="people reveal" role="group" aria-label="Chọn số người">
-      <button type="button" class="people__btn is-on" data-people="2" aria-pressed="true"><strong>2</strong> người</button>
-      <button type="button" class="people__btn" data-people="4" aria-pressed="false"><strong>4</strong> người</button>
-      <button type="button" class="people__btn" data-people="6" aria-pressed="false"><strong>6</strong> người</button>
-      <button type="button" class="people__btn" data-people="8" aria-pressed="false"><strong>8</strong> người</button>
+      {soNguoi.map((n, i) => (
+        <button type="button" class:list={['people__btn', i === 0 && 'is-on']} data-people={n} aria-pressed={i === 0 ? 'true' : 'false'}><strong>{n}</strong> người</button>
+      ))}
     </div>
 
     <ul class="combos" id="ds-combo" aria-live="polite">
-      <li class="combo" data-people="2">
-        <p class="combo__for">2 người</p>
-        <h3>Combo Hàn Huyên</h3>
-        <p class="combo__price">315.000đ</p>
-        <ul class="ticks">
-          <li>Cuốn heo quay - nhỏ</li>
-          <li>Cuốn chân giò - nhỏ</li>
-          <li>Set cuốn nem lụi Huế</li>
-        </ul>
-        <a class="btn btn--ghost" href="#dat-ban" data-ghi-chu="Combo Hàn Huyên (2 người)" data-so-nguoi="2">Đặt bàn với combo này</a>
-      </li>
-      <li class="combo combo--lau" data-people="2">
-        <p class="combo__for">2 người · có lẩu</p>
-        <h3>Combo Tâm Giao</h3>
-        <p class="combo__price">456.000đ</p>
-        <ul class="ticks">
-          <li>Cuốn heo quay - nhỏ</li>
-          <li>1 lẩu nồi bé tự chọn: tôm bầu, cua sông hoặc ốc</li>
-        </ul>
-        <a class="btn btn--ghost" href="#dat-ban" data-ghi-chu="Combo Tâm Giao (2 người)" data-so-nguoi="2">Đặt bàn với combo này</a>
-      </li>
-
-      <li class="combo" data-people="4">
-        <p class="combo__for">4 người</p>
-        <h3>Combo Quây Quần</h3>
-        <p class="combo__price">652.000đ</p>
-        <ul class="ticks">
-          <li>Set cuốn tổng hợp</li>
-          <li>Nộm rau càng cua bắp bò</li>
-          <li>Ốc nhồi thịt hấp sả</li>
-          <li>Nấm hải sản chiên lắc muối tôm</li>
-        </ul>
-        <a class="btn btn--ghost" href="#dat-ban" data-ghi-chu="Combo Quây Quần (4 người)" data-so-nguoi="4">Đặt bàn với combo này</a>
-      </li>
-      <li class="combo combo--lau" data-people="4">
-        <p class="combo__for">4 người · có lẩu</p>
-        <h3>Combo Đoàn Viên</h3>
-        <p class="combo__price">872.000đ</p>
-        <ul class="ticks">
-          <li>Sét cuốn thịt heo quay - lớn</li>
-          <li>Nộm rau càng cua bắp bò</li>
-          <li>Gà ta chiên mắm Sài Gòn</li>
-          <li>1 lẩu nồi bé tự chọn: tôm bầu, cua sông hoặc ốc</li>
-        </ul>
-        <a class="btn btn--ghost" href="#dat-ban" data-ghi-chu="Combo Đoàn Viên (4 người)" data-so-nguoi="4">Đặt bàn với combo này</a>
-      </li>
-
-      <li class="combo combo--lau" data-people="6">
-        <p class="combo__for">6 người · có lẩu</p>
-        <h3>Combo Sum Vầy</h3>
-        <p class="combo__price">1.268.000đ</p>
-        <ul class="ticks">
-          <li>Set cuốn tổng hợp</li>
-          <li>Gỏi bò kéo pháo</li>
-          <li>Chả ốc bọc giấy bạc</li>
-          <li>Khoai tây chiên</li>
-          <li>1 lẩu nồi lớn tự chọn: tôm bầu A Sinh hoặc cua sông siêu gạch</li>
-        </ul>
-        <a class="btn btn--ghost" href="#dat-ban" data-ghi-chu="Combo Sum Vầy (6 người)" data-so-nguoi="6">Đặt bàn với combo này</a>
-      </li>
-
-      <li class="combo combo--lau" data-people="8">
-        <p class="combo__for">8 người · có lẩu</p>
-        <h3>Combo Hoan Hỷ</h3>
-        <p class="combo__price">1.784.000đ</p>
-        <ul class="ticks">
-          <li>Set cuốn tổng hợp</li>
-          <li>Gỏi bò kéo pháo</li>
-          <li>Chả ốc bọc giấy bạc</li>
-          <li>Nọng heo chiên lá móc mật</li>
-          <li>Bò sốt tiêu xanh bản gang</li>
-          <li>Gà ta chiên mắm Sài Gòn</li>
-          <li>1 lẩu nồi lớn tự chọn: tôm bầu A Sinh hoặc cua sông siêu gạch</li>
-        </ul>
-        <a class="btn btn--ghost" href="#dat-ban" data-ghi-chu="Combo Hoan Hỷ (8 người)" data-so-nguoi="8">Đặt bàn với combo này</a>
-      </li>
+      {COMBO.map((c) => <TheCombo combo={c} coForm />)}
     </ul>
 
     <p class="note reveal">Combo có lẩu gồm 1 nồi lẩu chọn trong các loại ghi ở combo. Món trong combo không đổi sang món khác, anh chị muốn thêm món thì gọi thêm theo giá lẻ.</p>
