@@ -297,10 +297,14 @@ button { cursor: pointer; }
 .form { display: grid; gap: 18px; padding: 30px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
 .field { display: grid; gap: 7px; min-width: 0; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+/* iPhone vẽ ô ngày rộng hơn nửa hàng, đè lên ô giờ: màn hẹp xếp giờ xuống dưới ngày. */
+@media (max-width: 560px) {
+  .field-row { grid-template-columns: 1fr; gap: 18px; }
+}
 .field label { font-weight: 600; font-size: .9688rem; }
 .opt { font-weight: 400; color: var(--muted); }
 .field input, .field select, .field textarea {
-  width: 100%; min-height: 52px; padding: 12px 14px;
+  width: 100%; min-width: 0; min-height: 52px; padding: 12px 14px;
   background: var(--bg); border: 2px solid var(--line); border-radius: var(--radius-sm);
   font-size: 1.0625rem; /* từ 16px trở lên để iPhone không tự phóng to khi gõ */
   transition: border-color .15s ease, background-color .25s ease;
