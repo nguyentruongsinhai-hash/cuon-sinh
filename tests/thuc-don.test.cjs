@@ -285,3 +285,45 @@ test("tiêu đề h1 đứng dưới chữ đầu mục cỡ lớn dùng cỡ c�
   // Quy tắc phải nằm sau .page-head h1 thì mới thắng được ở trang Thực đơn
   assert.ok(css.indexOf(quyTac[0]) > css.indexOf(".page-head h1 {"), "quy tắc phải đặt sau .page-head h1");
 });
+
+// Chủ quán chốt 13/11/2026 (lượt 5): khung ảnh món 4:3 cắt mất phần chính của nhiều
+// ảnh dọc. Mỗi ảnh tự khai điểm lấy khung (object-position), xôi còn phóng nhẹ để
+// món dịch xuống được. Số liệu chọn bằng cách dựng thử khung 4:3 từ ảnh thật.
+test("ảnh món khai điểm lấy khung để mẹt cuốn, mâm nhân lẩu không bị che", async () => {
+  const { NHOM_MON } = await nap();
+  const mon = Object.fromEntries(NHOM_MON.flatMap((n) => n.mon).map((m) => [m.ten, m]));
+  const doc = (ten) => {
+    const k = mon[ten] && mon[ten].anh && mon[ten].anh.khung;
+    assert.ok(k, "chưa khai khung ảnh cho: " + ten);
+    const [x, y] = k.viTri.split(" ").map((v) => parseFloat(v));
+    return { x, y, phong: k.phong || 1 };
+  };
+  // Ảnh dọc: kéo khung xuống phần dưới để thấy trọn mẹt/mâm (mặc định 50% là giữa)
+  for (const ten of [
+    "Set cuốn tổng hợp",
+    "Sét cuốn thịt heo quay - lớn",
+    "Bánh tráng cuốn thịt chân giò - lớn",
+    "Cuốn chân giò - nhỏ",
+    "Lẩu ốc Sài Thành - nồi lớn",
+    "Lẩu bê tơ nhúng mẻ",
+    "Lẩu ốc - nồi bé",
+    "Lẩu tôm bầu - nồi bé",
+    "Lẩu cua sông - nồi bé",
+  ]) {
+    assert.ok(doc(ten).y >= 70, "khung ảnh chưa xuống đủ để thấy mẹt/mâm: " + ten);
+  }
+  // Cá lăng dịch sang phải: khung lấy lệch về bên trái ảnh
+  assert.ok(doc("Cuốn cá lăng nướng riềng").x < 50, "cá lăng chưa dịch sang phải");
+  // Gỏi bò dịch xuống: khung lấy lệch lên trên ảnh
+  assert.ok(doc("Gỏi bò kéo pháo").y < 50, "gỏi bò chưa dịch xuống");
+  // Xôi dịch sang trái và xuống: khung lệch phải, phóng nhẹ neo góc trên bên phải
+  const xoi = doc("Xôi chim trứng non đặc biệt");
+  assert.ok(xoi.x > 50 && xoi.phong > 1 && xoi.phong <= 1.15, "xôi chưa dịch sang trái và xuống");
+  assert.equal(mon["Xôi chim trứng non đặc biệt"].anh.khung.goc, "100% 0%");
+
+  const the = read("src", "components", "TheMon.astro");
+  assert.match(the, /object-position/, "thẻ món chưa in điểm lấy khung");
+  assert.match(the, /transform-origin/, "thẻ món chưa in điểm neo khi phóng ảnh");
+  // Phóng dùng thuộc tính scale riêng để không đè hiệu ứng rê chuột (transform)
+  assert.match(the, /scale:/);
+});

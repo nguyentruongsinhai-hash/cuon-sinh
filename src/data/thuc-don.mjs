@@ -13,7 +13,11 @@
 // Mỗi combo: ten, gia, nguoi, coLau, gom (các món), anh (ảnh ngang 1200x800, tỷ lệ 3:2,
 //   file đặt tên combo-<ten>.webp trong public/assets/img).
 
-const anh = (file, w, h) => ({ file, w, h });
+// khung (tuỳ chọn): khung ảnh món là 4:3 nên ảnh dọc bị cắt mất nửa. viTri là
+//   object-position (mặc định '50% 50%' = giữa ảnh; số dọc lớn hơn = lấy phần dưới,
+//   số ngang nhỏ hơn = lấy phần bên trái). phong + goc phóng nhẹ ảnh quanh điểm neo,
+//   dùng khi cần dịch món theo chiều ảnh đã vừa khít khung.
+const anh = (file, w, h, khung) => (khung ? { file, w, h, khung } : { file, w, h });
 
 export const NHOM_MON = [
 	{
@@ -24,13 +28,13 @@ export const NHOM_MON = [
 		kieu: 'the',
 		trangChu: true,
 		mon: [
-			{ ten: 'Set cuốn tổng hợp', gia: 288000, anh: anh('set-cuon-tong-hop.webp', 667, 1000), hot: true, top: true },
+			{ ten: 'Set cuốn tổng hợp', gia: 288000, anh: anh('set-cuon-tong-hop.webp', 667, 1000, { viTri: '50% 85%' }), hot: true, top: true },
 			{ ten: 'Cuốn heo quay - nhỏ', gia: 98000, anh: anh('cuon-heo-quay-nho.webp', 1000, 667), ghiChu: '1 người', hot: true, top: true },
 			{ ten: 'Set cuốn nem lụi Huế', gia: 129000, anh: anh('cuon-nem-lui-hue.webp', 1000, 667), top: true },
-			{ ten: 'Cuốn cá lăng nướng riềng', gia: 198000, anh: anh('cuon-ca-lang-nuong-rieng.webp', 1000, 573), top: true },
-			{ ten: 'Sét cuốn thịt heo quay - lớn', gia: 178000, anh: anh('set-cuon-heo-quay-lon.webp', 667, 1000), ghiChu: '2 người' },
-			{ ten: 'Cuốn chân giò - nhỏ', gia: 88000, anh: anh('cuon-chan-gio-nho.webp', 667, 1000), ghiChu: '1 người' },
-			{ ten: 'Bánh tráng cuốn thịt chân giò - lớn', gia: 158000, anh: anh('cuon-chan-gio-lon.webp', 667, 1000), ghiChu: '2 người' },
+			{ ten: 'Cuốn cá lăng nướng riềng', gia: 198000, anh: anh('cuon-ca-lang-nuong-rieng.webp', 1000, 573, { viTri: '25% 50%' }), top: true },
+			{ ten: 'Sét cuốn thịt heo quay - lớn', gia: 178000, anh: anh('set-cuon-heo-quay-lon.webp', 667, 1000, { viTri: '50% 85%' }), ghiChu: '2 người' },
+			{ ten: 'Cuốn chân giò - nhỏ', gia: 88000, anh: anh('cuon-chan-gio-nho.webp', 667, 1000, { viTri: '50% 80%' }), ghiChu: '1 người' },
+			{ ten: 'Bánh tráng cuốn thịt chân giò - lớn', gia: 158000, anh: anh('cuon-chan-gio-lon.webp', 667, 1000, { viTri: '50% 75%' }), ghiChu: '2 người' },
 		],
 	},
 	{
@@ -43,11 +47,11 @@ export const NHOM_MON = [
 		mon: [
 			{ ten: 'Lẩu cua sông siêu gạch', gia: 618000, anh: anh('lau-cua-song-sieu-gach.webp', 1000, 666), ghiChu: 'Nồi lớn, 4-5 người', hot: true, top: true },
 			{ ten: 'Lẩu tôm bầu A Sinh', gia: 618000, anh: anh('lau-tom-bau-a-sinh.webp', 1000, 669), ghiChu: 'Nồi lớn, 4-5 người', hot: true, top: true },
-			{ ten: 'Lẩu ốc Sài Thành - nồi lớn', gia: 588000, anh: anh('lau-oc-sai-thanh.webp', 667, 1000), ghiChu: '4-5 người', top: true },
-			{ ten: 'Lẩu bê tơ nhúng mẻ', gia: 468000, anh: anh('lau-be-to-nhung-me.webp', 685, 1000), ghiChu: '2-3 người', top: true },
-			{ ten: 'Lẩu cua sông - nồi bé', gia: 358000, anh: anh('lau-cua-song-noi-be.webp', 667, 1000), ghiChu: '2 người' },
-			{ ten: 'Lẩu tôm bầu - nồi bé', gia: 358000, anh: anh('lau-tom-bau-noi-be.webp', 668, 1000), ghiChu: '2 người' },
-			{ ten: 'Lẩu ốc - nồi bé', gia: 358000, anh: anh('lau-oc-noi-be.webp', 800, 1000), ghiChu: '2 người' },
+			{ ten: 'Lẩu ốc Sài Thành - nồi lớn', gia: 588000, anh: anh('lau-oc-sai-thanh.webp', 667, 1000, { viTri: '50% 88%' }), ghiChu: '4-5 người', top: true },
+			{ ten: 'Lẩu bê tơ nhúng mẻ', gia: 468000, anh: anh('lau-be-to-nhung-me.webp', 685, 1000, { viTri: '50% 70%' }), ghiChu: '2-3 người', top: true },
+			{ ten: 'Lẩu cua sông - nồi bé', gia: 358000, anh: anh('lau-cua-song-noi-be.webp', 667, 1000, { viTri: '50% 75%' }), ghiChu: '2 người' },
+			{ ten: 'Lẩu tôm bầu - nồi bé', gia: 358000, anh: anh('lau-tom-bau-noi-be.webp', 668, 1000, { viTri: '50% 80%' }), ghiChu: '2 người' },
+			{ ten: 'Lẩu ốc - nồi bé', gia: 358000, anh: anh('lau-oc-noi-be.webp', 800, 1000, { viTri: '50% 90%' }), ghiChu: '2 người' },
 		],
 	},
 	{
@@ -80,7 +84,7 @@ export const NHOM_MON = [
 		kieu: 'the',
 		trangChu: true,
 		mon: [
-			{ ten: 'Gỏi bò kéo pháo', gia: 138000, anh: anh('goi-bo-keo-phao.webp', 980, 1000), hot: true, top: true },
+			{ ten: 'Gỏi bò kéo pháo', gia: 138000, anh: anh('goi-bo-keo-phao.webp', 980, 1000, { viTri: '50% 5%' }), hot: true, top: true },
 			{ ten: 'Nộm rau càng cua bắp bò', gia: 138000, anh: anh('nom-rau-cang-cua-bap-bo.webp', 1000, 861), hot: true, top: true },
 			{ ten: 'Gỏi bưởi tôm thịt', gia: 148000, anh: anh('goi-buoi-tom-thit.webp', 974, 1000), top: true },
 		],
@@ -124,7 +128,7 @@ export const NHOM_MON = [
 		trangChu: true,
 		mon: [
 			{ ten: 'Cơm chiên tôm dứa', gia: 88000, anh: anh('com-chien-tom-dua.webp', 1000, 992), top: true },
-			{ ten: 'Xôi chim trứng non đặc biệt', gia: 128000, anh: anh('xoi-chim-trung-non-dac-biet.webp', 1000, 624), top: true },
+			{ ten: 'Xôi chim trứng non đặc biệt', gia: 128000, anh: anh('xoi-chim-trung-non-dac-biet.webp', 1000, 624, { viTri: '80% 50%', phong: 1.1, goc: '100% 0%' }), top: true },
 			{ ten: 'Miến xào tôm nấm', gia: 138000 },
 		],
 	},
