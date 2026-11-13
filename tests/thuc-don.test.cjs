@@ -119,3 +119,50 @@ test("trang /thuc-don/ có đủ mọi nhóm, mỗi nhóm một mục có id đ�
   assert.match(trang, /<h1>Thực đơn Cuốn Sinh<\/h1>/);
   assert.match(read("src", "components", "Footer.astro"), /href="\/thuc-don\/"/, "chân trang thiếu link thực đơn");
 });
+
+// Kích thước thật của file WebP, đọc thẳng từ phần đầu file (khỏi cần thư viện).
+function coWebp(file) {
+  const b = fs.readFileSync(file);
+  assert.equal(b.toString("ascii", 0, 4) + b.toString("ascii", 8, 12), "RIFFWEBP", "không phải WebP: " + file);
+  const kieu = b.toString("ascii", 12, 16);
+  if (kieu === "VP8 ") return { w: b.readUInt16LE(26) & 0x3fff, h: b.readUInt16LE(28) & 0x3fff };
+  if (kieu === "VP8X") return { w: b.readUIntLE(24, 3) + 1, h: b.readUIntLE(27, 3) + 1 };
+  if (kieu === "VP8L") {
+    const n = b.readUInt32LE(21);
+    return { w: (n & 0x3fff) + 1, h: ((n >> 14) & 0x3fff) + 1 };
+  }
+  throw new Error("WebP lạ: " + kieu);
+}
+
+// Chủ quán gửi 6 ảnh combo 1200x800 ngày 13/11/2026: thẻ combo có khung ảnh
+// ở cả trang chủ lẫn trang /thuc-don/ (hai trang dùng chung TheCombo.astro).
+test("combo nào cũng có ảnh riêng tỷ lệ 3:2, thẻ combo in ảnh đó", async () => {
+  const { COMBO } = await nap();
+  assert.equal(COMBO.length, 6);
+  const files = COMBO.map((c) => c.anh && c.anh.file);
+  assert.equal(new Set(files).size, COMBO.length, "combo dùng chung ảnh hoặc thiếu ảnh: " + files.join(", "));
+  for (const c of COMBO) {
+    assert.match(c.anh.file, /^combo-[a-z0-9-]+\.webp$/, "tên ảnh combo sai kiểu: " + c.anh.file);
+    const f = path.join(ROOT, "public", "assets", "img", c.anh.file);
+    assert.ok(fs.existsSync(f), "thiếu ảnh " + c.anh.file);
+    assert.deepEqual(coWebp(f), { w: c.anh.w, h: c.anh.h }, "kích thước khai sai so với file: " + c.anh.file);
+    assert.equal(c.anh.w * 2, c.anh.h * 3, "ảnh combo phải tỷ lệ 3:2: " + c.anh.file);
+    assert.ok(fs.statSync(f).size < 300 * 1024, "ảnh combo nặng quá 300KB: " + c.anh.file);
+  }
+
+  const the = read("src", "components", "TheCombo.astro");
+  assert.match(the, /class="combo__img"/, "thẻ combo chưa có khung ảnh");
+  assert.match(the, /src=\{'\/assets\/img\/' \+ c\.anh\.file\}/, "khung ảnh phải lấy file từ dữ liệu combo");
+  assert.match(the, /width=\{c\.anh\.w\}/, "ảnh thiếu chiều rộng, trang sẽ giật khi tải");
+  assert.match(the, /height=\{c\.anh\.h\}/, "ảnh thiếu chiều cao, trang sẽ giật khi tải");
+  assert.match(the, /alt=\{/, "ảnh combo thiếu chữ thay thế");
+  assert.match(the, /loading="lazy"/, "ảnh combo nằm dưới màn hình đầu, phải tải lười");
+
+  const css = read("public", "assets", "css", "site.css");
+  assert.match(css, /\.combo__img\s*\{[^}]*aspect-ratio:\s*3\s*\/\s*2/, "khung ảnh combo phải giữ tỷ lệ 3:2");
+  assert.match(css, /\.combo__img img\s*\{[^}]*object-fit:\s*cover/, "ảnh phải phủ kín khung");
+
+  for (const trang of ["index.astro", "thuc-don.astro"]) {
+    assert.match(read("src", "pages", trang), /<TheCombo combo=\{c\}/, trang + " phải in combo bằng thẻ chung");
+  }
+});
