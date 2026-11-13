@@ -1,0 +1,11 @@
+---
+// Ba dòng liên hệ trong ô "Đặt bàn, hỏi món", dùng chung cho trang chủ và trang Giới thiệu
+// để hai nơi luôn giống nhau. Dòng Fanpage mở thẳng khung chat Messenger của quán.
+import { HOTLINE, HOTLINE_TEL, MESSENGER_URL, ZALO_URL } from '../consts';
+---
+
+<ul class="contact__lines">
+	<li>Hotline: <a href={HOTLINE_TEL}>{HOTLINE}</a></li>
+	<li>Zalo: <a href={ZALO_URL} target="_blank" rel="noopener">Hotline Cuốn Sinh</a></li>
+	<li>Fanpage: <a href={MESSENGER_URL} target="_blank" rel="noopener">Nhắn Messenger</a></li>
+</ul>

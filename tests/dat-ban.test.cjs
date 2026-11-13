@@ -131,3 +131,13 @@ test("điện thoại: ô Giờ đến nằm dưới ô Ngày đến, không ch�
   );
   assert.match(css, /\.field input, \.field select, \.field textarea \{\s*width: 100%; min-width: 0;/, "ô nhập không được rộng hơn cột chứa nó");
 });
+
+test("iPhone: ô Ngày đến không tràn ra ngoài khung form", () => {
+  const css = fs.readFileSync(path.join(__dirname, "..", "public", "assets", "css", "site.css"), "utf8");
+  // Safari iOS vẽ ô ngày theo bề rộng riêng của nó, bỏ qua width: 100%. Phải tắt kiểu vẽ mặc định.
+  const ngay = css.match(/\.field input\[type="date"\] \{([^}]*)\}/);
+  assert.ok(ngay, "thiếu luật riêng cho ô ngày");
+  assert.match(ngay[1], /-webkit-appearance: none/, "phải tắt kiểu vẽ mặc định của Safari cho ô ngày");
+  assert.match(ngay[1], /max-width: 100%/, "ô ngày không được rộng hơn khung");
+  assert.match(css, /\.field \{[^}]*grid-template-columns: minmax\(0, 1fr\)/, "cột của ô nhập phải co được theo khung");
+});

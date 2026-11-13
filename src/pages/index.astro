@@ -4,6 +4,7 @@ import FormDatBan from '../components/FormDatBan.astro';
 import Base from '../layouts/Base.astro';
 import TheCombo from '../components/TheCombo.astro';
 import TheMon from '../components/TheMon.astro';
+import DongLienHe from '../components/DongLienHe.astro';
 import { MESSENGER_URL } from '../consts';
 import { COMBO, NHOM_MON, giaVN, monTrangChu, nhomTrangChu } from '../data/thuc-don.mjs';
 
@@ -213,8 +214,7 @@ const comboRe = COMBO.reduce((a, b) => (b.gia < a.gia ? b : a));
       </li>
       <li class="contact reveal">
         <h3>Đặt bàn, hỏi món</h3>
-        <p><a class="big" href="tel:0844566922">0844 566 922</a></p>
-        <a class="link" href="https://m.me/nhahangcuonsinh" target="_blank" rel="noopener">Nhắn Messenger</a>
+        <DongLienHe />
       </li>
       <li class="contact reveal">
         <h3>Theo dõi quán</h3>
