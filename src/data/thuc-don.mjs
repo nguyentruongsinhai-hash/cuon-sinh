@@ -69,7 +69,7 @@ export const NHOM_MON = [
 			{ ten: 'Ếch đồng chiên mắm', gia: 159000, anh: anh('ech-dong-chien-mam.webp', 1000, 771) },
 			{ ten: 'Ốc nhồi thịt hấp sả', gia: 138000, anh: anh('oc-nhoi-thit-hap-sa.webp', 969, 1000) },
 			{ ten: 'Gà hơ mông tiềm bí đỏ', gia: 368000, anh: anh('ga-ho-mong-tiem-bi-do.webp', 667, 1000), ghiChu: 'Đặt trước 1 ngày' },
-			{ ten: 'Cá diêu hồng sốt mắm xoài', gia: 268000, ghiChu: 'Đặt trước 1 ngày' },
+			{ ten: 'Cá diêu hồng sốt mắm xoài', gia: 268000, anh: anh('ca-dieu-hong-sot-mam-xoai.webp', 1000, 673), ghiChu: 'Đặt trước 1 ngày' },
 		],
 	},
 	{
@@ -112,7 +112,7 @@ export const NHOM_MON = [
 			{ ten: 'Ngó xuân xào tỏi', gia: 98000, anh: anh('ngo-xuan-xao-toi.webp', 1000, 641), top: true },
 			{ ten: 'Đậu Pháp xào trứng tim chim', gia: 138000, anh: anh('dau-phap-xao-trung-tim-chim.webp', 1000, 642), top: true },
 			{ ten: 'Đậu Pháp xào sốt sampa', gia: 98000 },
-			{ ten: 'Rau muống xào tỏi', gia: 88000 },
+			{ ten: 'Rau muống xào tỏi', gia: 88000, anh: anh('rau-muong-xao-toi.webp', 1000, 612), top: true },
 		],
 	},
 	{

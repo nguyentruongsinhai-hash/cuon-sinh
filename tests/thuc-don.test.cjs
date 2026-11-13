@@ -186,3 +186,14 @@ test("combo nào cũng có ảnh riêng tỷ lệ 3:2, thẻ combo in ảnh đó
     assert.match(read("src", "pages", trang), /<TheCombo combo=\{c\}/, trang + " phải in combo bằng thẻ chung");
   }
 });
+
+// Chủ quán gửi ảnh 13/11/2026: cá diêu hồng và rau muống đã có ảnh thật.
+test("cá diêu hồng sốt mắm xoài và rau muống xào tỏi đã có ảnh, rau muống lên trang chủ", async () => {
+  const { NHOM_MON, monTrangChu } = await nap();
+  const tim = (ten) => NHOM_MON.flatMap((n) => n.mon).find((m) => m.ten === ten);
+  assert.equal(tim("Cá diêu hồng sốt mắm xoài").anh?.file, "ca-dieu-hong-sot-mam-xoai.webp");
+  assert.equal(tim("Rau muống xào tỏi").anh?.file, "rau-muong-xao-toi.webp");
+  const rau = NHOM_MON.find((n) => n.slug === "rau");
+  assert.ok(monTrangChu(rau).some((m) => m.ten === "Rau muống xào tỏi"), "rau muống chưa hiện ở nhóm Rau trang chủ");
+  assert.equal(monTrangChu(rau).length, 4);
+});
