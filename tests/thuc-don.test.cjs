@@ -287,8 +287,8 @@ test("tiêu đề h1 đứng dưới chữ đầu mục cỡ lớn dùng cỡ c�
 });
 
 // Chủ quán chốt 13/11/2026 (lượt 5): khung ảnh món 4:3 cắt mất phần chính của nhiều
-// ảnh dọc. Mỗi ảnh tự khai điểm lấy khung (object-position), xôi còn phóng nhẹ để
-// món dịch xuống được. Số liệu chọn bằng cách dựng thử khung 4:3 từ ảnh thật.
+// ảnh dọc. Mỗi ảnh tự khai điểm lấy khung (object-position). Số liệu chọn bằng cách
+// dựng thử khung 4:3 từ ảnh thật.
 test("ảnh món khai điểm lấy khung để mẹt cuốn, mâm nhân lẩu không bị che", async () => {
   const { NHOM_MON } = await nap();
   const mon = Object.fromEntries(NHOM_MON.flatMap((n) => n.mon).map((m) => [m.ten, m]));
@@ -316,10 +316,11 @@ test("ảnh món khai điểm lấy khung để mẹt cuốn, mâm nhân lẩu k
   assert.ok(doc("Cuốn cá lăng nướng riềng").x < 50, "cá lăng chưa dịch sang phải");
   // Gỏi bò dịch xuống: khung lấy lệch lên trên ảnh
   assert.ok(doc("Gỏi bò kéo pháo").y < 50, "gỏi bò chưa dịch xuống");
-  // Xôi dịch sang trái và xuống: khung lệch phải, phóng nhẹ neo góc trên bên phải
+  // Xôi (chủ quán sửa lại lượt 6): bản lệch phải có phóng 1.1 làm món to ra và cắt mất
+  // quai chảo bên trái. Khung lấy lệch trái để thấy trọn chảo xôi lẫn bát hành phi, không phóng.
   const xoi = doc("Xôi chim trứng non đặc biệt");
-  assert.ok(xoi.x > 50 && xoi.phong > 1 && xoi.phong <= 1.15, "xôi chưa dịch sang trái và xuống");
-  assert.equal(mon["Xôi chim trứng non đặc biệt"].anh.khung.goc, "100% 0%");
+  assert.ok(xoi.x > 0 && xoi.x < 50, "khung xôi chưa lệch trái để thấy trọn chảo");
+  assert.equal(xoi.phong, 1, "ảnh xôi không được phóng to");
 
   const the = read("src", "components", "TheMon.astro");
   assert.match(the, /object-position/, "thẻ món chưa in điểm lấy khung");
