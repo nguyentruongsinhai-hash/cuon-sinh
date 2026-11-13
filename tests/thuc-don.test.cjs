@@ -197,3 +197,24 @@ test("cá diêu hồng sốt mắm xoài và rau muống xào tỏi đã có ả
   assert.ok(monTrangChu(rau).some((m) => m.ten === "Rau muống xào tỏi"), "rau muống chưa hiện ở nhóm Rau trang chủ");
   assert.equal(monTrangChu(rau).length, 4);
 });
+
+// Chủ quán chốt 13/11/2026: ở mục combo trang chủ, chữ "Combo" to hơn một cỡ
+// so với dòng "Đi mấy người, quán gợi ý luôn" ngay bên dưới.
+test("trang chủ: chữ Combo to hơn một cỡ so với dòng tiêu đề bên dưới", () => {
+  const home = read("src", "pages", "index.astro");
+  assert.match(home, /<p class="eyebrow eyebrow--lon">Combo<\/p>\s*<h2 id="h-combo">Đi mấy người, quán gợi ý luôn<\/h2>/);
+  const css = read("public", "assets", "css", "site.css");
+  const so = (re, ten) => {
+    const m = css.match(re);
+    assert.ok(m, "không thấy cỡ chữ của " + ten);
+    return m.slice(1).map(Number);
+  };
+  const clamp = /font-size:\s*clamp\(([\d.]+)rem,\s*([\d.]+)vw,\s*([\d.]+)rem\)/.source;
+  const h2 = so(new RegExp(/\nh2\s*\{[^}]*/.source + clamp), "h2");
+  const lon = so(new RegExp(/\.eyebrow--lon\s*\{[^}]*/.source + clamp), ".eyebrow--lon");
+  // Một cỡ = lớn hơn khoảng 1,25 lần ở mọi bề rộng màn hình
+  lon.forEach((v, i) => {
+    const tyLe = v / h2[i];
+    assert.ok(tyLe >= 1.2 && tyLe <= 1.3, "chữ Combo phải to hơn tiêu đề một cỡ, đang gấp " + tyLe.toFixed(2));
+  });
+});
