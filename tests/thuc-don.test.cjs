@@ -46,6 +46,17 @@ test("không đưa nhóm Gọi thêm và nhóm Khác lên web", async () => {
   for (const n of NHOM_MON) assert.doesNotMatch(n.moTa, /nhóm Gọi thêm/i, "mô tả nhóm " + n.ten + " còn nhắc nhóm Gọi thêm");
 });
 
+// Chủ quán chốt 13/11/2026: hai món gỏi chưa có ảnh thì không đưa lên web.
+test("nhóm Gỏi, nộm không còn hai món chưa có ảnh", async () => {
+  const { NHOM_MON } = await nap();
+  const goi = NHOM_MON.find((n) => n.slug === "goi-nom");
+  assert.deepEqual(
+    goi.mon.map((m) => m.ten),
+    ["Gỏi bò kéo pháo", "Nộm rau càng cua bắp bò", "Gỏi bưởi tôm thịt"],
+  );
+  for (const m of goi.mon) assert.ok(m.anh, "món gỏi thiếu ảnh: " + m.ten);
+});
+
 test("giá in ra đúng kiểu Việt Nam", async () => {
   const { giaVN } = await nap();
   assert.equal(giaVN(98000), "98.000đ");

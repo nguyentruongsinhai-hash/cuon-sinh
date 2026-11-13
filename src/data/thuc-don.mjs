@@ -83,8 +83,6 @@ export const NHOM_MON = [
 			{ ten: 'Gỏi bò kéo pháo', gia: 138000, anh: anh('goi-bo-keo-phao.webp', 980, 1000), hot: true, top: true },
 			{ ten: 'Nộm rau càng cua bắp bò', gia: 138000, anh: anh('nom-rau-cang-cua-bap-bo.webp', 1000, 861), hot: true, top: true },
 			{ ten: 'Gỏi bưởi tôm thịt', gia: 148000, anh: anh('goi-buoi-tom-thit.webp', 974, 1000), top: true },
-			{ ten: 'Gỏi hải sản sốt chua ngọt', gia: 148000 },
-			{ ten: 'Gỏi sứa xoài xanh', gia: 138000 },
 		],
 	},
 	{
