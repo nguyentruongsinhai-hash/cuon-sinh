@@ -221,10 +221,13 @@ test("trang chủ: chữ Combo to hơn một cỡ so với dòng tiêu đề bê
 
 // Chủ quán chốt 13/11/2026 (lượt 2): mọi chữ đầu mục (Thực đơn, Không gian,
 // Đặt bàn, Ghé quán...) đều to hơn dòng tiêu đề h2 bên dưới, giống mục Combo.
-// Nhãn nằm trên tiêu đề lớn h1 của trang thì giữ cỡ nhỏ.
-test("chữ đầu mục nào đứng trên tiêu đề h2 cũng dùng cỡ lớn, trên h1 thì giữ cỡ nhỏ", () => {
+// Nhãn nằm trên tiêu đề lớn h1 của trang thì giữ cỡ nhỏ, trừ dòng
+// "Món cuốn · Lẩu · Món Việt chia sẻ" (xem lượt 3 bên dưới).
+test("chữ đầu mục nào đứng trên tiêu đề h2 cũng dùng cỡ lớn, trên h1 thì giữ cỡ nhỏ trừ dòng đầu trang", () => {
   const nhan = /<p class="(eyebrow[^"]*)">([^<]*(?:<a [^>]*>[^<]*<\/a>)?)<\/p>\s*<(h1|h2)/g;
+  const NHAN_DAU_TRANG = "Món cuốn · Lẩu · Món Việt chia sẻ";
   let soMucLon = 0;
+  let soNhanDauTrang = 0;
   for (const trang of ["index.astro", "about.astro", "dat-ban.astro", "thuc-don.astro"]) {
     const html = read("src", "pages", trang);
     const tatCa = [...html.matchAll(nhan)];
@@ -234,10 +237,34 @@ test("chữ đầu mục nào đứng trên tiêu đề h2 cũng dùng cỡ lớ
       if (the === "h2") {
         assert.ok(lon, trang + ': chữ đầu mục "' + chu + '" phải to hơn tiêu đề bên dưới');
         soMucLon += 1;
+      } else if (chu === NHAN_DAU_TRANG) {
+        // Chủ quán chốt 13/11/2026 (lượt 3): dòng này bằng cỡ chữ đầu mục các phần khác.
+        assert.ok(lon, trang + ': dòng "' + chu + '" phải bằng cỡ chữ đầu mục');
+        soNhanDauTrang += 1;
       } else {
         assert.ok(!lon, trang + ': nhãn "' + chu + '" đứng trên h1, không phóng to');
       }
     }
   }
   assert.equal(soMucLon, 9, "trang chủ có 6 mục, trang giới thiệu có 3 mục");
+  assert.equal(soNhanDauTrang, 2, "dòng đầu trang có ở trang chủ và trang thực đơn");
+});
+
+// Chủ quán chốt 13/11/2026 (lượt 3): chữ đầu mục và dòng tiêu đề bên dưới đang to,
+// nhìn bị ngợp, nên cả hai cùng xuống một cỡ (chia 1,25). Chữ đầu mục vẫn to hơn
+// dòng dưới đúng một cỡ.
+test("chữ đầu mục và tiêu đề bên dưới đã xuống một cỡ so với bản cũ", () => {
+  const css = read("public", "assets", "css", "site.css");
+  const clamp = /font-size:\s*clamp\(([\d.]+)rem,\s*([\d.]+)vw,\s*([\d.]+)rem\)/.source;
+  const lay = (dau, ten) => {
+    const m = css.match(new RegExp(dau + clamp));
+    assert.ok(m, "không thấy cỡ chữ của " + ten);
+    return m.slice(1).map(Number);
+  };
+  const gan = (a, b) => Math.abs(a - b) < 0.011;
+  const cu = { lon: [2, 4, 2.875], h2: [1.6, 3.2, 2.3] };
+  const lon = lay(/\.eyebrow--lon\s*\{[^}]*/.source, ".eyebrow--lon");
+  const h2 = lay(/\nh2\s*\{[^}]*/.source, "h2");
+  lon.forEach((v, i) => assert.ok(gan(v, cu.lon[i] / 1.25), "chữ đầu mục chưa xuống một cỡ: " + lon.join(", ")));
+  h2.forEach((v, i) => assert.ok(gan(v, cu.h2[i] / 1.25), "tiêu đề dưới chữ đầu mục chưa xuống một cỡ: " + h2.join(", ")));
 });
