@@ -38,3 +38,9 @@ test("cụm nút nổi ghim ở góc phải và né thanh thao tác trên điệ
   assert.match(css, /\.lien-he\s*\{[^}]*position:\s*fixed[^}]*right:/, "phải ghim cố định bên phải");
   assert.match(css, /\.lien-he\s*\{[^}]*bottom:\s*calc\(60px/, "trên điện thoại phải nằm trên thanh thao tác 60px");
 });
+
+test("thanh đáy điện thoại: nút Nhắn tin mở Zalo của quán", () => {
+  const dock = fs.readFileSync(path.join(__dirname, "..", "src", "components", "Dock.astro"), "utf8");
+  assert.match(dock, /<a href=\{ZALO_URL\}[^>]*>[\s\S]*?Nhắn tin<\/a/, "nút Nhắn tin phải dẫn về Zalo");
+  assert.doesNotMatch(dock, /MESSENGER_URL/, "thanh đáy không còn dẫn sang Messenger");
+});
