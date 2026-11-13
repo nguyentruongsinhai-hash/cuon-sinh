@@ -268,3 +268,20 @@ test("chữ đầu mục và tiêu đề bên dưới đã xuống một cỡ so
   lon.forEach((v, i) => assert.ok(gan(v, cu.lon[i] / 1.25), "chữ đầu mục chưa xuống một cỡ: " + lon.join(", ")));
   h2.forEach((v, i) => assert.ok(gan(v, cu.h2[i] / 1.25), "tiêu đề dưới chữ đầu mục chưa xuống một cỡ: " + h2.join(", ")));
 });
+
+// Chủ quán chốt 13/11/2026 (lượt 4): dòng "Tươi ngon mỗi cuốn, ấm áp mỗi bữa" vẫn to
+// vì là h1. Tiêu đề h1 nào đứng ngay dưới chữ đầu mục cỡ lớn thì dùng đúng cỡ của
+// tiêu đề h2 ở các mục khác, để chữ đầu mục vẫn to hơn dòng dưới một cỡ.
+test("tiêu đề h1 đứng dưới chữ đầu mục cỡ lớn dùng cỡ của tiêu đề h2", () => {
+  const home = read("src", "pages", "index.astro");
+  assert.match(home, /<p class="eyebrow eyebrow--lon">[^<]+<\/p>\s*<h1>Tươi ngon mỗi cuốn,/);
+  const css = read("public", "assets", "css", "site.css");
+  const clamp = /font-size:\s*(clamp\([^)]*\))/.source;
+  const h2 = css.match(new RegExp(/\nh2\s*\{[^}]*/.source + clamp));
+  assert.ok(h2, "không thấy cỡ chữ của h2");
+  const quyTac = css.match(new RegExp(/\n\.eyebrow--lon \+ h1,\s*\.page-head \.eyebrow--lon \+ h1\s*\{[^}]*/.source + clamp));
+  assert.ok(quyTac, "chưa có quy tắc thu nhỏ h1 đứng dưới chữ đầu mục cỡ lớn (cả trang chủ lẫn trang con)");
+  assert.equal(quyTac[1], h2[1], "h1 dưới chữ đầu mục phải bằng cỡ tiêu đề h2");
+  // Quy tắc phải nằm sau .page-head h1 thì mới thắng được ở trang Thực đơn
+  assert.ok(css.indexOf(quyTac[0]) > css.indexOf(".page-head h1 {"), "quy tắc phải đặt sau .page-head h1");
+});
