@@ -1,0 +1,114 @@
+---
+// Trang thực đơn đầy đủ: mọi món nằm trong đúng nhóm của nó. Mỗi nhóm là một
+// khối có id trùng slug để menu sổ xuống ở đầu trang và nút "Xem thêm" ở trang
+// chủ dẫn thẳng tới (/thuc-don/#lau). Món và giá lấy từ src/data/thuc-don.mjs.
+import TheCombo from '../components/TheCombo.astro';
+import TheMon from '../components/TheMon.astro';
+import { HOTLINE, HOTLINE_TEL } from '../consts';
+import { NHOM_MON, giaVN } from '../data/thuc-don.mjs';
+import Base from '../layouts/Base.astro';
+
+const trang = new URL('/thuc-don/', Astro.site).href;
+// Dữ liệu có cấu trúc để Google hiểu đây là thực đơn của quán
+const ld = {
+	'@context': 'https://schema.org',
+	'@type': 'Menu',
+	name: 'Thực đơn Cuốn Sinh',
+	url: trang,
+	inLanguage: 'vi',
+	hasMenuSection: NHOM_MON.map((n) => ({
+		'@type': 'MenuSection',
+		name: n.ten,
+		url: trang + '#' + n.slug,
+		hasMenuItem: n.mon.map((m) => ({
+			'@type': 'MenuItem',
+			name: m.ten,
+			offers: { '@type': 'Offer', price: m.gia, priceCurrency: 'VND' },
+		})),
+	})),
+};
+---
+
+<Base
+	title="Thực đơn"
+	description="Thực đơn đầy đủ của Nhà hàng Cuốn Sinh kèm giá: món cuốn, lẩu, món chính, gỏi nộm, khai vị, rau, cơm xôi, combo theo số người và đồ uống."
+>
+	<script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(ld)} />
+
+	<header class="page-head">
+		<div class="wrap">
+			<p class="eyebrow">Món cuốn · Lẩu · Món Việt chia sẻ</p>
+			<h1>Thực đơn Cuốn Sinh</h1>
+			<p class="page-head__meta">
+				Giá bán tại quán, tính bằng đồng. Chọn nhóm món bên dưới để tới nhanh phần cần xem.
+			</p>
+		</div>
+	</header>
+
+	<nav class="mnav" aria-label="Các nhóm món">
+		<div class="mnav__in" id="nhom-mon">
+			{
+				NHOM_MON.map((n) => (
+					<a class="mnav__a" href={'#' + n.slug}>
+						{n.ten}
+					</a>
+				))
+			}
+		</div>
+	</nav>
+
+	<div class="menu">
+		{
+			NHOM_MON.map((n, thuTu) => (
+				<section class="mgroup" id={n.slug} aria-labelledby={'h-' + n.slug}>
+					<div class="wrap">
+						<div class="mgroup__head">
+							<h2 id={'h-' + n.slug}>{n.ten}</h2>
+							<span class="mgroup__dem">{n.mon.length} món</span>
+							<p class="sec__sub">{n.moTa}</p>
+						</div>
+
+						{n.kieu === 'the' && (
+							<ul class="dishes">
+								{n.mon.map((m, i) => (
+									<TheMon mon={m} hienGhiChu eager={thuTu === 0 && i < 4} />
+								))}
+							</ul>
+						)}
+
+						{n.kieu === 'combo' && (
+							<ul class="combos">
+								{n.mon.map((c) => (
+									<TheCombo combo={c} />
+								))}
+							</ul>
+						)}
+
+						{n.kieu === 'bang' && (
+							<ul class="plist">
+								{n.mon.map((m) => (
+									<li>
+										<span class="plist__ten">{m.ten}</span>
+										<span class="plist__gia">{giaVN(m.gia)}</span>
+									</li>
+								))}
+							</ul>
+						)}
+					</div>
+				</section>
+			))
+		}
+
+		<div class="wrap">
+			<div class="cta-box">
+				<div>
+					<h2>Chọn được món rồi?</h2>
+					<p>
+						Đặt bàn trước để quán xếp chỗ, hoặc gọi <a href={HOTLINE_TEL}>{HOTLINE}</a> nếu cần gấp trong hôm nay.
+					</p>
+				</div>
+				<a class="btn btn--primary btn--lg" href="/dat-ban/">Đặt bàn ngay</a>
+			</div>
+		</div>
+	</div>
+</Base>

@@ -1,0 +1,47 @@
+---
+// Thẻ một món: ảnh, tên, giá. Dùng ở trang chủ (có nhãn nhóm, lọc theo tab) và
+// trang /thuc-don/ (có ghi chú như "2 người", "Đặt trước 1 ngày").
+// Món chưa có ảnh thật thì hiện ô trống trung tính, không mượn ảnh món khác.
+import { giaVN } from '../data/thuc-don.mjs';
+
+interface Props {
+	mon: { ten: string; gia: number; anh?: { file: string; w: number; h: number }; ghiChu?: string; hot?: boolean };
+	/** Nhãn nhóm in trên thẻ (trang chủ) */
+	chip?: string;
+	/** Slug nhóm, để tab ở trang chủ lọc được */
+	cat?: string;
+	hienGhiChu?: boolean;
+	eager?: boolean;
+}
+
+const { mon, chip, cat, hienGhiChu = false, eager = false } = Astro.props;
+---
+
+<li class="dish" data-cat={cat} data-hot={cat && mon.hot ? '' : undefined}>
+	{
+		mon.anh ? (
+			<div class="dish__img">
+				<img
+					src={'/assets/img/' + mon.anh.file}
+					alt={mon.ten}
+					width={mon.anh.w}
+					height={mon.anh.h}
+					loading={eager ? 'eager' : 'lazy'}
+				/>
+			</div>
+		) : (
+			<div class="dish__img dish__img--trong" aria-hidden="true">
+				<svg viewBox="0 0 48 48">
+					<path d="M6 24h36a18 18 0 0 1-36 0zM17 42h14M19 8c-2 3 2 5 0 8M27 8c-2 3 2 5 0 8" />
+				</svg>
+				<span>Ảnh đang cập nhật</span>
+			</div>
+		)
+	}
+	<div class="dish__body">
+		{chip && <span class="chip">{chip}</span>}
+		<h3>{mon.ten}</h3>
+		{hienGhiChu && mon.ghiChu && <p class="dish__note">{mon.ghiChu}</p>}
+		<p class="price">{giaVN(mon.gia)}</p>
+	</div>
+</li>

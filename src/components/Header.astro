@@ -1,6 +1,10 @@
 ---
 // Thanh đầu trang dính. Ở trang chủ các mục cuộn tới khối trong trang,
 // ở trang khác thì dẫn về đúng khối đó của trang chủ.
+// Mục "Thực đơn": bấm thì sang trang /thuc-don/, rê chuột (hoặc bấm mũi tên trên
+// điện thoại) thì sổ ra các nhóm món lấy từ src/data/thuc-don.mjs.
+import { NHOM_MON } from '../data/thuc-don.mjs';
+
 const path = Astro.url.pathname;
 const isHome = path === '/';
 const home = isHome ? '' : '/';
@@ -18,7 +22,25 @@ const here = (prefix: string) => (path.startsWith(prefix) ? 'is-here' : undefine
 		</a>
 
 		<nav class="nav" id="menu-chinh" aria-label="Điều hướng chính">
-			<a href={home + '#mon-noi-bat'}>Thực đơn</a>
+			<div class="nav__item">
+				<a href="/thuc-don/" class={here('/thuc-don')}>Thực đơn</a>
+				<button
+					class="nav__more"
+					type="button"
+					aria-controls="menu-thuc-don"
+					aria-expanded="false"
+					aria-label="Mở các nhóm món"
+				>
+					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+				</button>
+				<ul class="sub" id="menu-thuc-don" aria-label="Các nhóm món">
+					{NHOM_MON.map((n) => (
+						<li>
+							<a href={'/thuc-don/#' + n.slug}>{n.ten}</a>
+						</li>
+					))}
+				</ul>
+			</div>
 			<a href={home + '#combo'}>Combo</a>
 			<a href={home + '#khong-gian'}>Không gian</a>
 			<a href="/about/" class={here('/about')}>Giới thiệu</a>
