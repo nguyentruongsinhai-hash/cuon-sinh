@@ -295,7 +295,7 @@ button { cursor: pointer; }
 .book__call a { color: var(--accent-text); font-weight: 800; white-space: nowrap; }
 
 .form { display: grid; gap: 18px; padding: 30px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
-.field { display: grid; gap: 7px; min-width: 0; }
+.field { display: grid; grid-template-columns: minmax(0, 1fr); gap: 7px; min-width: 0; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 /* iPhone vẽ ô ngày rộng hơn nửa hàng, đè lên ô giờ: màn hẹp xếp giờ xuống dưới ngày. */
 @media (max-width: 560px) {
@@ -309,6 +309,10 @@ button { cursor: pointer; }
   font-size: 1.0625rem; /* từ 16px trở lên để iPhone không tự phóng to khi gõ */
   transition: border-color .15s ease, background-color .25s ease;
 }
+/* Safari iOS vẽ ô ngày theo bề rộng riêng, bỏ qua width: 100% nên tràn khỏi khung form.
+   Tắt kiểu vẽ mặc định để ô co đúng theo cột, chữ ngày canh trái như các ô khác. */
+.field input[type="date"] { display: block; max-width: 100%; -webkit-appearance: none; appearance: none; }
+.field input[type="date"]::-webkit-date-and-time-value { text-align: left; }
 .field textarea { resize: vertical; min-height: 96px; }
 .field input:hover, .field select:hover, .field textarea:hover { border-color: var(--muted); }
 .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--primary); }
