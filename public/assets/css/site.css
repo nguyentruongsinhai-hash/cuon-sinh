@@ -336,6 +336,9 @@ button { cursor: pointer; }
 .contact h3 { font-size: .8125rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 .contact p { font-weight: 600; }
 .contact .big { font-size: 1.5rem; font-weight: 800; text-decoration: none; }
+.contact__lines { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-weight: 600; }
+.contact__lines a { font-weight: 700; text-decoration: none; overflow-wrap: anywhere; }
+.contact__lines a:hover { text-decoration: underline; }
 .link { margin-top: auto; font-weight: 700; text-decoration: none; overflow-wrap: anywhere; }
 .link::after { content: " →"; }
 .link:hover { text-decoration: underline; }

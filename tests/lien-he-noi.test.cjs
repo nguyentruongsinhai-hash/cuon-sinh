@@ -44,3 +44,15 @@ test("thanh đáy điện thoại: nút Nhắn tin mở Zalo của quán", () =>
   assert.match(dock, /<a href=\{ZALO_URL\}[^>]*>[\s\S]*?Nhắn tin<\/a/, "nút Nhắn tin phải dẫn về Zalo");
   assert.doesNotMatch(dock, /MESSENGER_URL/, "thanh đáy không còn dẫn sang Messenger");
 });
+
+test("trang chủ: ô Đặt bàn, hỏi món có ba dòng Hotline, Zalo, Fanpage kèm link", () => {
+  const home = fs.readFileSync(path.join(__dirname, "..", "src", "pages", "index.astro"), "utf8");
+  const o = home.match(/<h3>Đặt bàn, hỏi món<\/h3>([\s\S]*?)<\/li>\s*<li class="contact/);
+  assert.ok(o, "thiếu ô Đặt bàn, hỏi món");
+  const dong = [...o[1].matchAll(/<li>([^<]+)<a href=\{(\w+)\}[^>]*>([^<]+)<\/a><\/li>/g)].map((m) => [m[1].trim(), m[2], m[3]]);
+  assert.deepEqual(dong, [
+    ["Hotline:", "HOTLINE_TEL", "{HOTLINE}"],
+    ["Zalo:", "ZALO_URL", "Hotline Cuốn Sinh"],
+    ["Fanpage:", "FACEBOOK_URL", "Cuốn Sinh - Tinh Hoa Ẩm Thực Việt"],
+  ]);
+});
