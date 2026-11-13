@@ -77,7 +77,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 h1, h2, h3, p { margin: 0; }
 h1, h2, h3 { line-height: 1.25; letter-spacing: -.01em; text-wrap: balance; }
 h1 { font-size: clamp(2.1rem, 5.2vw, 3.6rem); font-weight: 800; line-height: 1.18; }
-h2 { font-size: clamp(1.6rem, 3.2vw, 2.3rem); font-weight: 800; }
+h2 { font-size: clamp(1.28rem, 2.56vw, 1.84rem); font-weight: 800; }
 h3 { font-size: 1.125rem; font-weight: 700; }
 a { color: var(--primary); text-underline-offset: 3px; }
 button, input, select, textarea { font: inherit; color: inherit; }
@@ -91,7 +91,7 @@ button { cursor: pointer; }
 
 .eyebrow { font-size: .8125rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--accent-text); margin-bottom: 10px; }
 /* Chữ đầu mục (Thực đơn, Combo, Không gian, Đặt bàn...) to hơn tiêu đề h2 bên dưới một cỡ (x1,25) */
-.eyebrow--lon { font-size: clamp(2rem, 4vw, 2.875rem); font-weight: 800; line-height: 1.15; letter-spacing: .03em; margin-bottom: 6px; text-wrap: balance; }
+.eyebrow--lon { font-size: clamp(1.6rem, 3.2vw, 2.3rem); font-weight: 800; line-height: 1.15; letter-spacing: .03em; margin-bottom: 6px; text-wrap: balance; }
 .hl { color: var(--primary); }
 .note { margin-top: 28px; color: var(--muted); font-size: .9375rem; max-width: 70ch; }
 
