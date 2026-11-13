@@ -120,3 +120,14 @@ test("trang API chạy trên Worker (không dựng tĩnh) và form gọi đúng 
   assert.match(api, /export async function POST/);
   assert.match(fs.readFileSync(path.join(ROOT, "public", "assets", "js", "site.js"), "utf8"), /fetch\("\/api\/dat-ban"/);
 });
+
+test("điện thoại: ô Giờ đến nằm dưới ô Ngày đến, không chồng lên nhau", () => {
+  const css = fs.readFileSync(path.join(__dirname, "..", "public", "assets", "css", "site.css"), "utf8");
+  // iPhone vẽ ô ngày rộng hơn nửa hàng nên hai ô đè nhau: màn hẹp phải xếp một cột.
+  assert.match(
+    css,
+    /@media \(max-width: 560px\) \{\s*\.field-row \{ grid-template-columns: 1fr;/,
+    "màn hẹp phải xếp Ngày đến và Giờ đến thành một cột",
+  );
+  assert.match(css, /\.field input, \.field select, \.field textarea \{\s*width: 100%; min-width: 0;/, "ô nhập không được rộng hơn cột chứa nó");
+});
