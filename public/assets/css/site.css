@@ -511,6 +511,10 @@ button { cursor: pointer; }
 .wrap--narrow { width: min(100% - 40px, 760px); }
 .page-head { padding: 64px 0 8px; }
 .page-head h1 { font-size: clamp(2rem, 4.4vw, 3rem); line-height: 1.15; font-weight: 800; letter-spacing: -.01em; margin-top: 10px; }
+/* Tiêu đề h1 đứng ngay dưới chữ đầu mục cỡ lớn (đầu trang chủ, đầu trang Thực đơn) dùng cỡ của h2,
+   để chữ đầu mục vẫn to hơn dòng dưới một cỡ như các mục khác. Đặt sau .page-head h1 để thắng nó. */
+.eyebrow--lon + h1,
+.page-head .eyebrow--lon + h1 { font-size: clamp(1.28rem, 2.56vw, 1.84rem); line-height: 1.25; }
 .page-head .eyebrow a { color: inherit; text-decoration: none; }
 .page-head .eyebrow a:hover { text-decoration: underline; }
 .page-head__meta { margin-top: 14px; color: var(--muted); font-size: .9688rem; }
