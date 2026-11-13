@@ -218,3 +218,26 @@ test("trang chủ: chữ Combo to hơn một cỡ so với dòng tiêu đề bê
     assert.ok(tyLe >= 1.2 && tyLe <= 1.3, "chữ Combo phải to hơn tiêu đề một cỡ, đang gấp " + tyLe.toFixed(2));
   });
 });
+
+// Chủ quán chốt 13/11/2026 (lượt 2): mọi chữ đầu mục (Thực đơn, Không gian,
+// Đặt bàn, Ghé quán...) đều to hơn dòng tiêu đề h2 bên dưới, giống mục Combo.
+// Nhãn nằm trên tiêu đề lớn h1 của trang thì giữ cỡ nhỏ.
+test("chữ đầu mục nào đứng trên tiêu đề h2 cũng dùng cỡ lớn, trên h1 thì giữ cỡ nhỏ", () => {
+  const nhan = /<p class="(eyebrow[^"]*)">([^<]*(?:<a [^>]*>[^<]*<\/a>)?)<\/p>\s*<(h1|h2)/g;
+  let soMucLon = 0;
+  for (const trang of ["index.astro", "about.astro", "dat-ban.astro", "thuc-don.astro"]) {
+    const html = read("src", "pages", trang);
+    const tatCa = [...html.matchAll(nhan)];
+    assert.equal(tatCa.length, (html.match(/class="eyebrow/g) || []).length, trang + ": có nhãn đầu mục không đứng ngay trên h1/h2");
+    for (const [, lop, chu, the] of tatCa) {
+      const lon = lop.split(" ").includes("eyebrow--lon");
+      if (the === "h2") {
+        assert.ok(lon, trang + ': chữ đầu mục "' + chu + '" phải to hơn tiêu đề bên dưới');
+        soMucLon += 1;
+      } else {
+        assert.ok(!lon, trang + ': nhãn "' + chu + '" đứng trên h1, không phóng to');
+      }
+    }
+  }
+  assert.equal(soMucLon, 9, "trang chủ có 6 mục, trang giới thiệu có 3 mục");
+});

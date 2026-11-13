@@ -90,8 +90,8 @@ button { cursor: pointer; }
 .skip:focus { top: 12px; }
 
 .eyebrow { font-size: .8125rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--accent-text); margin-bottom: 10px; }
-/* Nhãn mục to hơn tiêu đề h2 bên dưới một cỡ (x1,25), dùng cho mục Combo ở trang chủ */
-.eyebrow--lon { font-size: clamp(2rem, 4vw, 2.875rem); font-weight: 800; line-height: 1.15; letter-spacing: .03em; margin-bottom: 6px; }
+/* Chữ đầu mục (Thực đơn, Combo, Không gian, Đặt bàn...) to hơn tiêu đề h2 bên dưới một cỡ (x1,25) */
+.eyebrow--lon { font-size: clamp(2rem, 4vw, 2.875rem); font-weight: 800; line-height: 1.15; letter-spacing: .03em; margin-bottom: 6px; text-wrap: balance; }
 .hl { color: var(--primary); }
 .note { margin-top: 28px; color: var(--muted); font-size: .9375rem; max-width: 70ch; }
 
