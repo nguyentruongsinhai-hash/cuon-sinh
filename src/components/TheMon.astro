@@ -5,7 +5,13 @@
 import { giaVN } from '../data/thuc-don.mjs';
 
 interface Props {
-	mon: { ten: string; gia: number; anh?: { file: string; w: number; h: number }; ghiChu?: string; hot?: boolean };
+	mon: {
+		ten: string;
+		gia: number;
+		anh?: { file: string; w: number; h: number; khung?: { viTri: string; phong?: number; goc?: string } };
+		ghiChu?: string;
+		hot?: boolean;
+	};
 	/** Nhãn nhóm in trên thẻ (trang chủ) */
 	chip?: string;
 	/** Slug nhóm, để tab ở trang chủ lọc được */
@@ -15,6 +21,19 @@ interface Props {
 }
 
 const { mon, chip, cat, hienGhiChu = false, eager = false } = Astro.props;
+
+// Điểm lấy khung riêng của từng ảnh (xem chú thích hàm anh() trong thuc-don.mjs).
+// Phóng dùng thuộc tính scale riêng nên không đè hiệu ứng rê chuột (transform).
+const khung = mon.anh?.khung;
+const kieuAnh = khung
+	? [
+			'object-position:' + khung.viTri,
+			khung.phong ? 'scale:' + khung.phong : '',
+			khung.goc ? 'transform-origin:' + khung.goc : '',
+		]
+			.filter(Boolean)
+			.join(';')
+	: undefined;
 ---
 
 <li class="dish" data-cat={cat} data-hot={cat && mon.hot ? '' : undefined}>
@@ -26,6 +45,7 @@ const { mon, chip, cat, hienGhiChu = false, eager = false } = Astro.props;
 					alt={mon.ten}
 					width={mon.anh.w}
 					height={mon.anh.h}
+					style={kieuAnh}
 					loading={eager ? 'eager' : 'lazy'}
 				/>
 			</div>
