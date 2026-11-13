@@ -4,6 +4,7 @@ import FormDatBan from '../components/FormDatBan.astro';
 import Base from '../layouts/Base.astro';
 import TheCombo from '../components/TheCombo.astro';
 import TheMon from '../components/TheMon.astro';
+import { MESSENGER_URL } from '../consts';
 import { COMBO, NHOM_MON, giaVN, monTrangChu, nhomTrangChu } from '../data/thuc-don.mjs';
 
 // Mục thực đơn: tab "Nổi bật" và mỗi nhóm tối đa 4 món, đủ món nằm ở trang /thuc-don/.
@@ -127,7 +128,7 @@ const comboRe = COMBO.reduce((a, b) => (b.gia < a.gia ? b : a));
 
     <div class="more reveal">
       <a class="btn btn--ghost btn--more" id="xem-them-mon" href="/thuc-don/">Xem thực đơn đầy đủ</a>
-      <p class="note">Giá bán tại quán. Ở đây mỗi nhóm chỉ hiện vài món tiêu biểu, đủ món và giá nằm ở trang <a href="/thuc-don/">Thực đơn</a>.</p>
+      <p class="note">Chưa biết chọn món nào? <a href={MESSENGER_URL} target="_blank" rel="noopener">Nhắn fanpage Cuốn Sinh</a> để được tư vấn thêm về món ăn.</p>
     </div>
   </div>
 </section>

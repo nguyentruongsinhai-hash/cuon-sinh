@@ -97,6 +97,15 @@ test("trang chủ lấy món từ dữ liệu chung và có nút xem thêm dẫn
   assert.match(js, /xem-them-mon/, "site.js chưa đổi nút xem thêm theo nhóm đang chọn");
 });
 
+test("trang chủ: dòng ghi chú dưới món mời nhắn fanpage để được tư vấn, không còn nói chỉ hiện vài món", () => {
+  const home = read("src", "pages", "index.astro");
+  const ghiChu = home.match(/<div class="more reveal">[\s\S]*?<p class="note">([\s\S]*?)<\/p>/);
+  assert.ok(ghiChu, "thiếu dòng ghi chú dưới nút xem thực đơn");
+  assert.match(ghiChu[1], /tư vấn/, "dòng ghi chú phải mời khách hỏi tư vấn món");
+  assert.match(ghiChu[1], /href=\{MESSENGER_URL\}/, "dòng ghi chú phải dẫn sang Messenger của fanpage");
+  assert.doesNotMatch(ghiChu[1], /tiêu biểu/, "web đã đủ món, bỏ câu chỉ hiện vài món tiêu biểu");
+});
+
 test("đầu trang: bấm Thực đơn sang trang /thuc-don/, rê chuột sổ ra các nhóm món", () => {
   const header = read("src", "components", "Header.astro");
   assert.match(header, /href="\/thuc-don\/"[^>]*>\s*Thực đơn/, "mục Thực đơn phải dẫn sang /thuc-don/");
