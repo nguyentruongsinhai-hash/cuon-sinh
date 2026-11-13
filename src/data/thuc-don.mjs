@@ -10,6 +10,8 @@
 //   trangChu (nhóm có tab ở trang chủ), mon.
 // Mỗi món: ten, gia (đồng), anh {file, w, h} nếu có ảnh thật, ghiChu,
 //   hot (lên tab "Nổi bật" ở trang chủ), top (hiện ở tab của nhóm ở trang chủ, tối đa 4).
+// Mỗi combo: ten, gia, nguoi, coLau, gom (các món), anh (ảnh ngang 1200x800, tỷ lệ 3:2,
+//   file đặt tên combo-<ten>.webp trong public/assets/img).
 
 const anh = (file, w, h) => ({ file, w, h });
 
@@ -137,12 +139,14 @@ export const NHOM_MON = [
 		mon: [
 			{
 				ten: 'Combo Hàn Huyên',
+				anh: anh('combo-han-huyen.webp', 1200, 800),
 				gia: 315000,
 				nguoi: 2,
 				gom: ['Cuốn heo quay - nhỏ', 'Cuốn chân giò - nhỏ', 'Set cuốn nem lụi Huế'],
 			},
 			{
 				ten: 'Combo Tâm Giao',
+				anh: anh('combo-tam-giao.webp', 1200, 800),
 				gia: 456000,
 				nguoi: 2,
 				coLau: true,
@@ -150,12 +154,14 @@ export const NHOM_MON = [
 			},
 			{
 				ten: 'Combo Quây Quần',
+				anh: anh('combo-quay-quan.webp', 1200, 800),
 				gia: 652000,
 				nguoi: 4,
 				gom: ['Set cuốn tổng hợp', 'Nộm rau càng cua bắp bò', 'Ốc nhồi thịt hấp sả', 'Nấm hải sản chiên lắc muối tôm'],
 			},
 			{
 				ten: 'Combo Đoàn Viên',
+				anh: anh('combo-doan-vien.webp', 1200, 800),
 				gia: 872000,
 				nguoi: 4,
 				coLau: true,
@@ -168,6 +174,7 @@ export const NHOM_MON = [
 			},
 			{
 				ten: 'Combo Sum Vầy',
+				anh: anh('combo-sum-vay.webp', 1200, 800),
 				gia: 1268000,
 				nguoi: 6,
 				coLau: true,
@@ -181,6 +188,7 @@ export const NHOM_MON = [
 			},
 			{
 				ten: 'Combo Hoan Hỷ',
+				anh: anh('combo-hoan-hy.webp', 1200, 800),
 				gia: 1784000,
 				nguoi: 8,
 				coLau: true,

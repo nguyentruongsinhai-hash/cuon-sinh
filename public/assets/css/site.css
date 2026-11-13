@@ -257,7 +257,10 @@ button { cursor: pointer; }
 .people__btn.is-on { background: var(--accent-soft); border-color: var(--accent); color: var(--text); }
 
 .combos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
-.combo { display: flex; flex-direction: column; padding: 28px; background: var(--surface); border: 1px solid var(--line); border-top: 6px solid var(--primary); border-radius: var(--radius); }
+.combo { display: flex; flex-direction: column; overflow: hidden; background: var(--surface); border: 1px solid var(--line); border-top: 6px solid var(--primary); border-radius: var(--radius); }
+.combo__img { aspect-ratio: 3 / 2; background: var(--surface-2); }
+.combo__img img { width: 100%; height: 100%; object-fit: cover; }
+.combo__body { display: flex; flex-direction: column; flex: 1; padding: 28px; }
 .combo--lau { border-top-color: var(--accent); }
 .combo[hidden] { display: none; }
 .combo.is-in { animation: pop .3s ease both; }
@@ -480,7 +483,7 @@ button { cursor: pointer; }
   .price { font-size: 1.0313rem; }
   .people__btn { min-width: 0; padding: 0 6px; }
   .people__btn strong { display: block; margin: 0; line-height: 1.1; }
-  .combo, .form { padding: 22px 18px; }
+  .combo__body, .form { padding: 22px 18px; }
   .combo .btn { align-self: stretch; }
   .stats li { padding: 20px 16px; }
 }
