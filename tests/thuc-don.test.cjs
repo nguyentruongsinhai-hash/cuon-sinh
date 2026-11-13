@@ -13,7 +13,7 @@ const nap = () => import("../src/data/thuc-don.mjs");
 
 test("dữ liệu thực đơn: nhóm không trùng, món nào cũng có tên và giá", async () => {
   const { NHOM_MON } = await nap();
-  assert.ok(NHOM_MON.length >= 10, "thiếu nhóm món");
+  assert.ok(NHOM_MON.length >= 9, "thiếu nhóm món");
   const slugs = NHOM_MON.map((n) => n.slug);
   assert.equal(new Set(slugs).size, slugs.length, "trùng slug nhóm");
   for (const n of NHOM_MON) {
@@ -27,7 +27,23 @@ test("dữ liệu thực đơn: nhóm không trùng, món nào cũng có tên v�
     }
   }
   const tong = NHOM_MON.reduce((s, n) => s + n.mon.length, 0);
-  assert.ok(tong >= 85, "thực đơn đầy đủ phải có từ 85 món, đang có " + tong);
+  assert.ok(tong >= 60, "thực đơn đầy đủ phải có từ 60 món, đang có " + tong);
+});
+
+// Chủ quán chốt 13/11/2026: đồ nhúng lẩu, phần gọi thêm và nhóm "Khác"
+// (đậu phộng, hạt mix, khăn ướt) không đưa lên web.
+test("không đưa nhóm Gọi thêm và nhóm Khác lên web", async () => {
+  const { NHOM_MON } = await nap();
+  const slugs = NHOM_MON.map((n) => n.slug);
+  assert.deepEqual(slugs, ["cuon", "lau", "mon-chinh", "goi-nom", "khai-vi", "rau", "com-xoi", "combo", "do-uong"]);
+  const ten = NHOM_MON.map((n) => n.ten);
+  assert.ok(!ten.includes("Gọi thêm") && !ten.includes("Khác"), "còn nhóm đã bỏ: " + ten.join(", "));
+  const tatCaMon = NHOM_MON.flatMap((n) => n.mon.map((m) => m.ten));
+  for (const boDi of ["Thịt bò nhúng lẩu", "Nước lẩu tôm", "Thịt quay gọi thêm", "Khăn ướt", "Gói hạt mix"]) {
+    assert.ok(!tatCaMon.includes(boDi), "món của nhóm đã bỏ vẫn còn trên web: " + boDi);
+  }
+  // Không còn chỗ nào trỏ khách tới nhóm đã bỏ
+  for (const n of NHOM_MON) assert.doesNotMatch(n.moTa, /nhóm Gọi thêm/i, "mô tả nhóm " + n.ten + " còn nhắc nhóm Gọi thêm");
 });
 
 test("giá in ra đúng kiểu Việt Nam", async () => {

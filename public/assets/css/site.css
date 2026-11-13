@@ -570,7 +570,7 @@ button { cursor: pointer; }
 .mgroup .dish__body h3 { margin-bottom: 6px; }
 .mgroup .price { margin-top: auto; }
 
-/* Bảng giá gọn cho món gọi thêm, đồ uống: tên bên trái, giá bên phải */
+/* Bảng giá gọn cho đồ uống: tên bên trái, giá bên phải */
 .plist { columns: 2; column-gap: 48px; padding: 10px 28px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
 .plist li { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px dashed var(--line); break-inside: avoid; }
 .plist__gia { flex: none; color: var(--accent-text); font-weight: 700; }
