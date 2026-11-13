@@ -1,4 +1,5 @@
 ---
+import DongLienHe from '../components/DongLienHe.astro';
 import { HOTLINE, HOTLINE_TEL, MAPS_URL } from '../consts';
 import Base from '../layouts/Base.astro';
 ---
@@ -103,7 +104,7 @@ import Base from '../layouts/Base.astro';
 				</li>
 				<li class="contact reveal">
 					<h3>Đặt bàn, hỏi món</h3>
-					<p><a class="big" href={HOTLINE_TEL}>{HOTLINE}</a></p>
+					<DongLienHe />
 					<a class="link" href="/#dat-ban">Đặt bàn trực tuyến</a>
 				</li>
 			</ul>

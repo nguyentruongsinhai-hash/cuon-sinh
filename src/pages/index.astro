@@ -4,7 +4,8 @@ import FormDatBan from '../components/FormDatBan.astro';
 import Base from '../layouts/Base.astro';
 import TheCombo from '../components/TheCombo.astro';
 import TheMon from '../components/TheMon.astro';
-import { FACEBOOK_URL, HOTLINE, HOTLINE_TEL, MESSENGER_URL, ZALO_URL } from '../consts';
+import DongLienHe from '../components/DongLienHe.astro';
+import { MESSENGER_URL } from '../consts';
 import { COMBO, NHOM_MON, giaVN, monTrangChu, nhomTrangChu } from '../data/thuc-don.mjs';
 
 // Mục thực đơn: tab "Nổi bật" và mỗi nhóm tối đa 4 món, đủ món nằm ở trang /thuc-don/.
@@ -213,11 +214,7 @@ const comboRe = COMBO.reduce((a, b) => (b.gia < a.gia ? b : a));
       </li>
       <li class="contact reveal">
         <h3>Đặt bàn, hỏi món</h3>
-        <ul class="contact__lines">
-          <li>Hotline: <a href={HOTLINE_TEL}>{HOTLINE}</a></li>
-          <li>Zalo: <a href={ZALO_URL} target="_blank" rel="noopener">Hotline Cuốn Sinh</a></li>
-          <li>Fanpage: <a href={FACEBOOK_URL} target="_blank" rel="noopener">Cuốn Sinh - Tinh Hoa Ẩm Thực Việt</a></li>
-        </ul>
+        <DongLienHe />
       </li>
       <li class="contact reveal">
         <h3>Theo dõi quán</h3>

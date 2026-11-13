@@ -45,14 +45,18 @@ test("thanh đáy điện thoại: nút Nhắn tin mở Zalo của quán", () =>
   assert.doesNotMatch(dock, /MESSENGER_URL/, "thanh đáy không còn dẫn sang Messenger");
 });
 
-test("trang chủ: ô Đặt bàn, hỏi món có ba dòng Hotline, Zalo, Fanpage kèm link", () => {
-  const home = fs.readFileSync(path.join(__dirname, "..", "src", "pages", "index.astro"), "utf8");
-  const o = home.match(/<h3>Đặt bàn, hỏi món<\/h3>([\s\S]*?)<\/li>\s*<li class="contact/);
-  assert.ok(o, "thiếu ô Đặt bàn, hỏi món");
-  const dong = [...o[1].matchAll(/<li>([^<]+)<a href=\{(\w+)\}[^>]*>([^<]+)<\/a><\/li>/g)].map((m) => [m[1].trim(), m[2], m[3]]);
+test("ô Đặt bàn, hỏi món: ba dòng Hotline, Zalo, Fanpage kèm link, trang chủ và trang Giới thiệu dùng chung", () => {
+  const goc = path.join(__dirname, "..", "src");
+  const dongLienHe = fs.readFileSync(path.join(goc, "components", "DongLienHe.astro"), "utf8");
+  const dong = [...dongLienHe.matchAll(/<li>([^<]+)<a href=\{(\w+)\}[^>]*>([^<]+)<\/a><\/li>/g)].map((m) => [m[1].trim(), m[2], m[3]]);
   assert.deepEqual(dong, [
     ["Hotline:", "HOTLINE_TEL", "{HOTLINE}"],
     ["Zalo:", "ZALO_URL", "Hotline Cuốn Sinh"],
-    ["Fanpage:", "FACEBOOK_URL", "Cuốn Sinh - Tinh Hoa Ẩm Thực Việt"],
+    ["Fanpage:", "MESSENGER_URL", "Nhắn Messenger"],
   ]);
+  // Hai trang in cùng một component thì không lệch nhau được.
+  for (const trang of ["index.astro", "about.astro"]) {
+    const html = fs.readFileSync(path.join(goc, "pages", trang), "utf8");
+    assert.match(html, /<h3>Đặt bàn, hỏi món<\/h3>\s*<DongLienHe \/>/, trang + " chưa dùng ba dòng liên hệ chung");
+  }
 });
