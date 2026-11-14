@@ -8,6 +8,9 @@
 //      Javis (chạy trên máy của quán, đang cầm tài khoản Zalo hotline) đọc các dòng
 //      còn trống cột "Zalo", gửi tin vào nhóm rồi điền giờ gửi vào cột đó.
 //      Worker không gửi Zalo trực tiếp được vì Zalo không có API cho nhóm chat.
+//   4. Ghi sổ xong, Worker gọi hook của Javis để Javis xử lý ngay (không quét định kỳ).
+//      Hook chỉ là tiếng chuông: gọi hỏng thì đơn vẫn nằm trong sổ và lượt chuông sau
+//      Javis gửi bù, nên lỗi ở bước này không làm hỏng đơn của khách.
 //
 // File viết bằng JS thuần, không phụ thuộc Astro hay Cloudflare, để test chạy
 // được bằng `node --test` (fetch và đồng hồ truyền từ ngoài vào).
@@ -17,6 +20,10 @@
 //   SHEET_TAB        tên tab, mặc định "DAT BAN WEB"
 //   GOOGLE_SA_EMAIL  email service account được chia sẻ quyền sửa file đó
 //   GOOGLE_SA_KEY    private key PEM của service account
+//   JAVIS_HOOK_URL   địa chỉ hook của Javis; để trống thì bỏ qua bước 4
+//   JAVIS_HOOK_TOKEN token của hook (Authorization: Bearer)
+//   JAVIS_ACCESS_CLIENT_ID, JAVIS_ACCESS_CLIENT_SECRET  service token Cloudflare Access
+//                    đứng trước hook
 
 export const HOTLINE = "0844 566 922";
 export const KHUNG_GIO = [["09:00", "14:00"], ["16:30", "22:00"]];
@@ -30,6 +37,7 @@ export const COT = [
 
 const LOI_HE_THONG = `Hệ thống đặt bàn đang trục trặc. Anh/chị gọi giúp bên em số ${HOTLINE} để giữ bàn nhé.`;
 const HAN_GOI_MS = 8000;
+const HAN_GOI_HOOK_MS = 4000; // hook trả 202 ngay; không bắt khách chờ lâu
 
 /**
  * Xử lý một đơn. Trả { status, body }; không ném lỗi ra ngoài.
@@ -60,7 +68,40 @@ export async function xuLyDatBan(d, env = {}, { fetch: fetchFn = globalThis.fetc
     log("dat-ban: khong ghi duoc Sheets", don.ma_don, e && e.message);
     return ketQua(502, LOI_HE_THONG);
   }
+  await baoJavis(env, don, fetchFn, log);
   return ketQua(200, "ok", { ma_don: don.ma_don });
+}
+
+/**
+ * Báo Javis có đơn mới. Không gửi thông tin khách: Javis tự đọc sổ.
+ * Không ném lỗi: dòng đã nằm trong sổ, Javis gửi bù ở lượt sau.
+ */
+export async function baoJavis(env, don, fetchFn, log = () => {}) {
+  if (!env.JAVIS_HOOK_URL || !env.JAVIS_HOOK_TOKEN) return false;
+  const headers = {
+    "content-type": "application/json",
+    "user-agent": "cuon-sinh-worker/dat-ban",
+    authorization: `Bearer ${env.JAVIS_HOOK_TOKEN}`,
+    "idempotency-key": don.ma_don,
+  };
+  if (env.JAVIS_ACCESS_CLIENT_ID && env.JAVIS_ACCESS_CLIENT_SECRET) {
+    headers["cf-access-client-id"] = env.JAVIS_ACCESS_CLIENT_ID;
+    headers["cf-access-client-secret"] = env.JAVIS_ACCESS_CLIENT_SECRET;
+  }
+  try {
+    const r = await fetchFn(env.JAVIS_HOOK_URL, {
+      method: "POST",
+      headers,
+      redirect: "manual", // bị Access chặn sẽ trả 302 về trang đăng nhập: coi là lỗi
+      body: JSON.stringify({ event: "dat_ban_web", ma_don: don.ma_don }),
+      signal: AbortSignal.timeout(HAN_GOI_HOOK_MS),
+    });
+    if (r.status === 200 || r.status === 202) return true;
+    log("dat-ban: hook Javis tra", r.status, don.ma_don);
+  } catch (e) {
+    log("dat-ban: khong goi duoc hook Javis", don.ma_don, e && e.message);
+  }
+  return false;
 }
 
 function ketQua(status, thong_bao, them = {}) {

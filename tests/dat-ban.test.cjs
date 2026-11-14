@@ -23,7 +23,7 @@ const ENV = {
   GOOGLE_SA_KEY: privateKey.export({ type: "pkcs8", format: "pem" }),
 };
 
-function fetchGia({ sheetsOk = true } = {}) {
+function fetchGia({ sheetsOk = true, hook = 202 } = {}) {
   const goi = [];
   const fn = async (url, init = {}) => {
     goi.push({ url: String(url), init });
@@ -32,6 +32,10 @@ function fetchGia({ sheetsOk = true } = {}) {
     }
     if (String(url).startsWith("https://sheets.googleapis.com/")) {
       return sheetsOk ? new Response("{}", { status: 200 }) : new Response("quota", { status: 429 });
+    }
+    if (String(url).startsWith("https://javis.vi-du/")) {
+      if (hook === "nem") throw new Error("mất mạng");
+      return new Response("{}", { status: hook });
     }
     throw new Error("gọi mạng ngoài dự kiến: " + url);
   };
@@ -112,6 +116,55 @@ test("không lưu được đơn thì KHÔNG báo thành công, mời khách g�
   const loi = await xuLyDatBan(DON, ENV, { fetch: fetchGia({ sheetsOk: false }), now: BAY_GIO });
   assert.equal(loi.status, 502);
   assert.equal(loi.body.ok, false);
+});
+
+const ENV_HOOK = {
+  ...ENV,
+  JAVIS_HOOK_URL: "https://javis.vi-du/hooks/wh_gia",
+  JAVIS_HOOK_TOKEN: "token-hook-gia",
+  JAVIS_ACCESS_CLIENT_ID: "id-gia.access",
+  JAVIS_ACCESS_CLIENT_SECRET: "khoa-gia",
+};
+
+test("ghi sổ xong thì gọi hook Javis đúng một lần, chỉ gửi mã đơn", async () => {
+  const { xuLyDatBan } = await nap();
+  const f = fetchGia();
+  const kq = await xuLyDatBan(DON, ENV_HOOK, { fetch: f, now: BAY_GIO });
+  assert.equal(kq.status, 200);
+  const goi = f.goi.filter((g) => g.url.startsWith("https://javis.vi-du/"));
+  assert.equal(goi.length, 1);
+  const sheets = f.goi.findIndex((g) => g.url.startsWith("https://sheets.googleapis.com/"));
+  assert.ok(sheets >= 0 && sheets < f.goi.indexOf(goi[0]), "phải ghi sổ trước rồi mới gọi hook");
+  const { init } = goi[0];
+  assert.equal(init.method, "POST");
+  assert.equal(init.headers.authorization, "Bearer token-hook-gia");
+  assert.equal(init.headers["idempotency-key"], kq.body.ma_don);
+  assert.equal(init.headers["cf-access-client-id"], "id-gia.access");
+  assert.equal(init.headers["cf-access-client-secret"], "khoa-gia");
+  assert.ok(init.headers["user-agent"]);
+  assert.deepEqual(JSON.parse(init.body), { event: "dat_ban_web", ma_don: kq.body.ma_don });
+  assert.doesNotMatch(init.body, /912345678|Nguyễn/, "không gửi thông tin khách qua hook");
+});
+
+test("hook lỗi hoặc mất mạng thì đơn vẫn thành công vì dòng đã vào sổ", async () => {
+  const { xuLyDatBan } = await nap();
+  for (const hook of [500, 302, 403, "nem"]) {
+    const nhat = [];
+    const kq = await xuLyDatBan(DON, ENV_HOOK, { fetch: fetchGia({ hook }), now: BAY_GIO, log: (...a) => nhat.push(a.join(" ")) });
+    assert.equal(kq.status, 200, "hook " + hook);
+    assert.equal(nhat.length, 1, "phải ghi nhật ký lỗi hook " + hook);
+    assert.doesNotMatch(nhat[0], /token-hook-gia|khoa-gia/, "nhật ký không được chứa bí mật");
+  }
+});
+
+test("chưa đặt địa chỉ hook thì bỏ qua, và không ghi được sổ thì không gọi hook", async () => {
+  const { xuLyDatBan } = await nap();
+  const f1 = fetchGia();
+  assert.equal((await xuLyDatBan(DON, ENV, { fetch: f1, now: BAY_GIO })).status, 200);
+  assert.equal(f1.goi.filter((g) => g.url.startsWith("https://javis.vi-du/")).length, 0);
+  const f2 = fetchGia({ sheetsOk: false });
+  assert.equal((await xuLyDatBan(DON, ENV_HOOK, { fetch: f2, now: BAY_GIO })).status, 502);
+  assert.equal(f2.goi.filter((g) => g.url.startsWith("https://javis.vi-du/")).length, 0);
 });
 
 test("trang API chạy trên Worker (không dựng tĩnh) và form gọi đúng địa chỉ", () => {
