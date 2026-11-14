@@ -33,3 +33,30 @@ test("không còn nội dung mẫu của Astro", () => {
     assert.doesNotMatch(read(f), /Lorem ipsum|Astro Blog|Hello, Astronaut|Your name here|astrodotbuild|Atkinson/i, rel(f));
   }
 });
+
+// Chủ quán báo 14/11/2026: thêm trang vào màn hình chính iPhone ra ô đen chữ "C".
+// iPhone không dùng favicon.svg, nó cần apple-touch-icon dạng PNG, vuông, KHÔNG trong
+// suốt (chỗ trong suốt bị tô đen). Android lấy icon từ manifest.
+test("thêm vào màn hình chính ra icon chiếc nón của quán", () => {
+  const ROOT = path.join(__dirname, "..");
+  const coPng = (f) => {
+    const b = fs.readFileSync(f);
+    assert.equal(b.toString("latin1", 1, 4), "PNG", "không phải PNG: " + f);
+    // IHDR: rộng, cao (4 byte mỗi số), rồi độ sâu màu và kiểu màu (2 = RGB, không có kênh trong suốt)
+    return { w: b.readUInt32BE(16), h: b.readUInt32BE(20), kieuMau: b[25] };
+  };
+  const base = read(path.join(SRC, "layouts", "Base.astro"));
+  assert.match(base, /<link rel="apple-touch-icon" sizes="180x180" href="\/apple-touch-icon\.png" \/>/);
+  assert.match(base, /<link rel="manifest" href="\/site\.webmanifest" \/>/);
+  assert.match(base, /<meta name="apple-mobile-web-app-title" content="Cuốn Sinh" \/>/);
+  assert.deepEqual(coPng(path.join(ROOT, "public", "apple-touch-icon.png")), { w: 180, h: 180, kieuMau: 2 });
+
+  const mf = JSON.parse(read(path.join(ROOT, "public", "site.webmanifest")));
+  assert.equal(mf.short_name, "Cuốn Sinh");
+  for (const co of [192, 512]) {
+    const ic = mf.icons.find((i) => i.sizes === co + "x" + co);
+    assert.ok(ic, "manifest thiếu icon " + co);
+    assert.equal(ic.type, "image/png");
+    assert.deepEqual(coPng(path.join(ROOT, "public", ic.src)), { w: co, h: co, kieuMau: 2 });
+  }
+});

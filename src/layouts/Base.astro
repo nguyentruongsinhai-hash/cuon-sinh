@@ -43,6 +43,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 		<meta property="og:url" content={canonical} />
 		<meta property="og:image" content={new URL(image, Astro.site)} />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<!-- iPhone không dùng favicon.svg: thiếu apple-touch-icon thì màn hình chính ra ô đen chữ "C" -->
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+		<meta name="apple-mobile-web-app-title" content="Cuốn Sinh" />
+		<link rel="manifest" href="/site.webmanifest" />
 		<link rel="sitemap" href="/sitemap-index.xml" />
 		<link rel="alternate" type="application/rss+xml" title={SITE_NAME} href="/rss.xml" />
 		<!-- Đặt giao diện sáng/tối TRƯỚC khi trang vẽ ra để không nháy màu -->
