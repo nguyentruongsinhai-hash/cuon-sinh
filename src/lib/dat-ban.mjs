@@ -8,6 +8,9 @@
 //      Javis (chạy trên máy của quán, đang cầm tài khoản Zalo hotline) đọc các dòng
 //      còn trống cột "Zalo", gửi tin vào nhóm rồi điền giờ gửi vào cột đó.
 //      Worker không gửi Zalo trực tiếp được vì Zalo không có API cho nhóm chat.
+//      Trước khi ghi, Worker đọc sổ để dò đơn lặp của cùng số điện thoại (xem
+//      mục "chống gửi lặp" bên dưới): khách bấm gửi nhiều lần thì nhóm Zalo không
+//      bị dội tin.
 //   4. Ghi sổ xong, Worker gọi hook của Javis để Javis xử lý ngay (không quét định kỳ).
 //      Hook chỉ là tiếng chuông: gọi hỏng thì đơn vẫn nằm trong sổ và lượt chuông sau
 //      Javis gửi bù, nên lỗi ở bước này không làm hỏng đơn của khách.
@@ -29,6 +32,8 @@ export const HOTLINE = "0844 566 922";
 export const KHUNG_GIO = [["09:00", "14:00"], ["16:30", "22:00"]];
 export const SO_NGAY_TOI_DA = 60;
 export const TAB_MAC_DINH = "DAT BAN WEB";
+// Một số điện thoại gửi được tối đa chừng này đơn trong một ngày (tính theo ngày gửi).
+export const SO_DON_TOI_DA_MOI_NGAY = 3;
 // Thứ tự cột trong sổ. Đổi ở đây thì phải đổi hàng tiêu đề trong file Sheets.
 export const COT = [
   "Mã đơn", "Nhận lúc", "Ngày đến", "Giờ đến", "Họ tên", "SĐT",
@@ -63,7 +68,25 @@ export async function xuLyDatBan(d, env = {}, { fetch: fetchFn = globalThis.fetc
   };
 
   try {
-    await ghiSheet(env, don, fetchFn);
+    if (!env.SHEET_ID || !env.GOOGLE_SA_EMAIL || !env.GOOGLE_SA_KEY) throw new Error("thiếu cấu hình Sheets");
+    const token = await layTokenGoogle(env.GOOGLE_SA_EMAIL, env.GOOGLE_SA_KEY, fetchFn);
+
+    // Chống gửi lặp. Không đọc được sổ thì vẫn nhận đơn: thà dội tin còn hơn mất khách.
+    let cu = [];
+    try {
+      cu = await docDonCu(env, token, don.sdt, fetchFn);
+    } catch (e) {
+      log("dat-ban: khong doc duoc so de do trung", don.ma_don, e && e.message);
+    }
+    const yHet = cu.find((x) => x.ngay === don.ngay && x.gio === don.gio);
+    if (yHet) return ketQua(200, "ok", { ma_don: yHet.ma_don, trung: true });
+    const homNay = don.nhan_luc.slice(-10);
+    if (cu.filter((x) => x.nhan_luc.endsWith(homNay)).length >= SO_DON_TOI_DA_MOI_NGAY) {
+      return ketQua(429, `Số điện thoại này đã gửi ${SO_DON_TOI_DA_MOI_NGAY} yêu cầu đặt bàn hôm nay. Anh/chị cần đổi hoặc đặt thêm xin gọi ${HOTLINE} giúp bên em nhé.`);
+    }
+    don.don_cu = cu.filter((x) => x.ngay === don.ngay).pop() || null;
+
+    await ghiSheet(env, don, token, fetchFn);
   } catch (e) {
     log("dat-ban: khong ghi duoc Sheets", don.ma_don, e && e.message);
     return ketQua(502, LOI_HE_THONG);
@@ -185,14 +208,32 @@ export function tinDatBan(don) {
     `Thời gian đặt bàn: ${don.gio} ${d}/${m}/${y}`,
     `Ghi chú: ${don.ghi_chu || "không"}`,
     `Nguồn: website, mã ${don.ma_don}, nhận ${don.nhan_luc}. Nhân viên gọi xác nhận lại với khách.`,
+    ...(don.don_cu
+      ? [`Lưu ý: số này đã có đơn ${don.don_cu.ma_don} (${don.don_cu.gio}, ${don.don_cu.so_nguoi} người) cùng ngày. Có thể khách đổi đơn, hỏi lại khi gọi.`]
+      : []),
   ].join("\n");
 }
 
 // ---------- Google Sheets (service account, JWT RS256) ----------
 
-async function ghiSheet(env, don, fetchFn) {
-  if (!env.SHEET_ID || !env.GOOGLE_SA_EMAIL || !env.GOOGLE_SA_KEY) throw new Error("thiếu cấu hình Sheets");
-  const token = await layTokenGoogle(env.GOOGLE_SA_EMAIL, env.GOOGLE_SA_KEY, fetchFn);
+/**
+ * Chống gửi lặp: đọc sổ, trả các đơn còn hiệu lực của cùng số điện thoại, cũ trước mới sau.
+ * Đơn có chữ "hủy" (hoặc "huỷ", "huy") ở cột "Trạng thái" không tính: khách đặt lại được.
+ */
+async function docDonCu(env, token, sdt, fetchFn) {
+  const vung = encodeURIComponent(`'${env.SHEET_TAB || TAB_MAC_DINH}'!A:J`);
+  const r = await fetchFn(`https://sheets.googleapis.com/v4/spreadsheets/${env.SHEET_ID}/values/${vung}`, {
+    headers: { authorization: `Bearer ${token}` },
+    signal: AbortSignal.timeout(HAN_GOI_MS),
+  });
+  if (!r.ok) throw new Error(`sheets doc ${r.status}`);
+  const j = await r.json();
+  return (j.values || [])
+    .filter((h) => chuanSdt(h[5]) === sdt && !/h[uủ][yỷ]/i.test(String(h[9] || "").normalize("NFC")))
+    .map((h) => ({ ma_don: String(h[0] || ""), nhan_luc: String(h[1] || ""), ngay: String(h[2] || ""), gio: String(h[3] || ""), so_nguoi: String(h[6] || "") }));
+}
+
+async function ghiSheet(env, don, token, fetchFn) {
   const vung = encodeURIComponent(`'${env.SHEET_TAB || TAB_MAC_DINH}'!A:L`);
   // RAW: Sheets không tự hiểu lại giá trị, nên số điện thoại giữ số 0 đầu và
   // ghi chú bắt đầu bằng "=" không biến thành công thức.

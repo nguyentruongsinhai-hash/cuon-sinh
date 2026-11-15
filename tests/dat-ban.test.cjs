@@ -23,12 +23,17 @@ const ENV = {
   GOOGLE_SA_KEY: privateKey.export({ type: "pkcs8", format: "pem" }),
 };
 
-function fetchGia({ sheetsOk = true, hook = 202 } = {}) {
+function fetchGia({ sheetsOk = true, hook = 202, dong = [], docOk = true } = {}) {
   const goi = [];
   const fn = async (url, init = {}) => {
     goi.push({ url: String(url), init });
     if (String(url).startsWith("https://oauth2.googleapis.com/token")) {
       return new Response(JSON.stringify({ access_token: "token-gia" }), { status: 200 });
+    }
+    if (String(url).startsWith("https://sheets.googleapis.com/") && (init.method || "GET") === "GET") {
+      // đọc sổ để dò đơn trùng: `dong` là các dòng đã có (không tính hàng tiêu đề)
+      if (!docOk) return new Response("loi", { status: 500 });
+      return new Response(JSON.stringify({ values: [["Mã đơn", "Nhận lúc"], ...dong] }), { status: 200 });
     }
     if (String(url).startsWith("https://sheets.googleapis.com/")) {
       return sheetsOk ? new Response("{}", { status: 200 }) : new Response("quota", { status: 429 });
@@ -66,8 +71,9 @@ test("đơn hợp lệ được ghi một dòng vào Sheets, kèm tin soạn s�
   assert.equal(kq.body.ok, true);
   assert.match(kq.body.ma_don, /^WEB261113-[0-9A-F]{4}$/);
 
-  const ghi = fetchFn.goi.find((g) => g.url.startsWith("https://sheets.googleapis.com/"));
-  assert.ok(ghi, "chưa gọi Sheets");
+  // Lần gọi Sheets đầu là đọc sổ dò đơn trùng; lần ghi là lệnh :append
+  const ghi = fetchFn.goi.find((g) => g.url.startsWith("https://sheets.googleapis.com/") && g.url.includes(":append"));
+  assert.ok(ghi, "chưa ghi Sheets");
   assert.match(ghi.url, /spreadsheets\/sheet-gia\/values\/.*:append\?valueInputOption=RAW/);
   assert.equal(ghi.init.headers.authorization, "Bearer token-gia");
   const [hang] = JSON.parse(ghi.init.body).values;
@@ -193,4 +199,67 @@ test("iPhone: ô Ngày đến không tràn ra ngoài khung form", () => {
   assert.match(ngay[1], /-webkit-appearance: none/, "phải tắt kiểu vẽ mặc định của Safari cho ô ngày");
   assert.match(ngay[1], /max-width: 100%/, "ô ngày không được rộng hơn khung");
   assert.match(css, /\.field \{[^}]*grid-template-columns: minmax\(0, 1fr\)/, "cột của ô nhập phải co được theo khung");
+});
+
+// ---------- chống gửi lặp ----------
+
+const laGhi = (g) => g.url.includes(":append");
+const laHook = (g) => g.url.startsWith("https://javis.vi-du/");
+// Dòng đã có trong sổ: khách 0912345678 đặt 18:30 ngày 14/11, 4 người, gửi lúc 09:50 hôm nay
+const DONG_CU = ["WEB261113-AAAA", "09:50 13/11/2026", "2026-11-14", "18:30", "Nguyễn Văn A", "0912345678", 4, "", "website", "mới"];
+
+test("gửi lại y hệt đơn đã có (cùng số, ngày, giờ): không ghi dòng mới, không báo nhóm, trả mã cũ", async () => {
+  const { xuLyDatBan } = await nap();
+  const fetchFn = fetchGia({ dong: [DONG_CU] });
+  const kq = await xuLyDatBan(DON, ENV_HOOK, { fetch: fetchFn, now: BAY_GIO });
+  assert.equal(kq.status, 200);
+  assert.equal(kq.body.ok, true);
+  assert.equal(kq.body.ma_don, "WEB261113-AAAA");
+  assert.equal(fetchFn.goi.filter(laGhi).length, 0, "đơn trùng vẫn bị ghi thêm dòng");
+  assert.equal(fetchFn.goi.filter(laHook).length, 0, "đơn trùng vẫn rung chuông Javis");
+});
+
+test("cùng số, cùng ngày nhưng đổi giờ: vẫn nhận, tin Zalo ghi rõ đơn cũ để nhân viên biết là khách đổi", async () => {
+  const { xuLyDatBan } = await nap();
+  const fetchFn = fetchGia({ dong: [DONG_CU] });
+  const kq = await xuLyDatBan({ ...DON, gio: "18:00" }, ENV_HOOK, { fetch: fetchFn, now: BAY_GIO });
+  assert.equal(kq.status, 200);
+  const [hang] = JSON.parse(fetchFn.goi.find(laGhi).init.body).values;
+  assert.match(hang[11], /Lưu ý: số này đã có đơn WEB261113-AAAA \(18:30, 4 người\) cùng ngày/);
+  assert.equal(fetchFn.goi.filter(laHook).length, 1);
+});
+
+test("một số điện thoại gửi quá 3 đơn trong ngày thì bị chặn, mời gọi hotline", async () => {
+  const { xuLyDatBan, SO_DON_TOI_DA_MOI_NGAY } = await nap();
+  assert.equal(SO_DON_TOI_DA_MOI_NGAY, 3);
+  const dong = ["11:00", "12:00", "13:00"].map((gio, i) => [`WEB261113-000${i}`, "09:5" + i + " 13/11/2026", "2026-11-20", gio, "A", "0912345678", 2, "", "website", "mới"]);
+  const fetchFn = fetchGia({ dong });
+  const kq = await xuLyDatBan(DON, ENV_HOOK, { fetch: fetchFn, now: BAY_GIO });
+  assert.equal(kq.status, 429);
+  assert.equal(kq.body.ok, false);
+  assert.match(kq.body.thong_bao, /0844 566 922/);
+  assert.equal(fetchFn.goi.filter(laGhi).length, 0);
+  assert.equal(fetchFn.goi.filter(laHook).length, 0);
+});
+
+test("đơn của số khác, đơn đã huỷ và đơn gửi hôm trước không bị tính là trùng", async () => {
+  const { xuLyDatBan } = await nap();
+  const dong = [
+    [...DONG_CU.slice(0, 5), "0987654321", ...DONG_CU.slice(6)], // số khác
+    [...DONG_CU.slice(0, 9), "Đã hủy"], // đã huỷ: khách đặt lại được
+    ...["11:00", "12:00", "13:00"].map((gio) => ["WEB261112-0000", "20:00 12/11/2026", "2026-11-20", gio, "A", "0912345678", 2, "", "website", "mới"]),
+  ];
+  const fetchFn = fetchGia({ dong });
+  const kq = await xuLyDatBan(DON, ENV, { fetch: fetchFn, now: BAY_GIO });
+  assert.equal(kq.status, 200);
+  const [hang] = JSON.parse(fetchFn.goi.find(laGhi).init.body).values;
+  assert.doesNotMatch(hang[11], /Lưu ý/);
+});
+
+test("không đọc được sổ để dò trùng thì vẫn nhận đơn, không để mất khách", async () => {
+  const { xuLyDatBan } = await nap();
+  const fetchFn = fetchGia({ docOk: false });
+  const kq = await xuLyDatBan(DON, ENV, { fetch: fetchFn, now: BAY_GIO });
+  assert.equal(kq.status, 200);
+  assert.equal(fetchFn.goi.filter(laGhi).length, 1);
 });
