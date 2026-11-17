@@ -1,6 +1,7 @@
 ---
 // Trang chủ Cuốn Sinh. Đầu trang, chân trang và giao diện sáng/tối nằm ở khung chung Base.astro.
 import FormDatBan from '../components/FormDatBan.astro';
+import AnhKhongGian from '../components/AnhKhongGian.astro';
 import Base from '../layouts/Base.astro';
 import TheCombo from '../components/TheCombo.astro';
 import TheMon from '../components/TheMon.astro';
@@ -174,6 +175,7 @@ const comboRe = COMBO.reduce((a, b) => (b.gia < a.gia ? b : a));
       <li><strong>24-30</strong><span>khách một dãy dài</span></li>
     </ul>
   </div>
+  <AnhKhongGian />
 </section>
 
 <!-- ============ 6. ĐẶT BÀN ============ -->
