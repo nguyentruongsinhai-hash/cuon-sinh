@@ -1,0 +1,28 @@
+---
+// Trang báo "không tìm thấy". Cloudflare trả file này kèm mã 404 cho địa chỉ sai,
+// thay cho trang trắng: khách vẫn có đường về thực đơn và đặt bàn. Không cho lên Google.
+import { HOTLINE, HOTLINE_TEL } from '../consts';
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Không tìm thấy trang" description="Địa chỉ này không có trên website Cuốn Sinh." noindex>
+	<header class="page-head wrap">
+		<p class="eyebrow">Lỗi 404</p>
+		<h1>Trang này không có ở Cuốn Sinh</h1>
+		<p class="lead">Địa chỉ có thể đã đổi hoặc gõ nhầm. Anh chị chọn một lối bên dưới nhé.</p>
+	</header>
+	<section class="sec sec--tight">
+		<div class="wrap">
+			<div class="cta-box">
+				<div>
+					<h2>Tìm món hay đặt bàn?</h2>
+					<p>
+						Xem <a href="/thuc-don/">thực đơn và bảng giá</a>, <a href="/lien-he/">địa chỉ và giờ mở cửa</a>,
+						hoặc gọi <a href={HOTLINE_TEL}>{HOTLINE}</a>.
+					</p>
+				</div>
+				<a class="btn btn--primary btn--lg" href="/">Về trang chủ</a>
+			</div>
+		</div>
+	</section>
+</Base>

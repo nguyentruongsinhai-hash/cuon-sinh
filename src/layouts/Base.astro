@@ -7,6 +7,7 @@ import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import LienHeNoi from '../components/LienHeNoi.astro';
 import { DEFAULT_OG_IMAGE, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE } from '../consts';
+import { duongDanLd, goiLd } from '../lib/schema.mjs';
 import themeScript from '../scripts/theme.cjs?raw';
 
 interface Props {
@@ -14,6 +15,12 @@ interface Props {
 	description?: string;
 	image?: string;
 	ogType?: string;
+	/** Chữ mô tả ảnh chia sẻ (Facebook, Zalo đọc cho người dùng trình đọc màn hình) */
+	imageAlt?: string;
+	/** Trang không nên lên Google (trang báo lỗi 404) */
+	noindex?: boolean;
+	/** Các cấp nằm giữa Trang chủ và trang này, ví dụ bài viết nằm dưới Tin tức */
+	capCha?: { ten: string; path: string }[];
 }
 
 const {
@@ -21,9 +28,19 @@ const {
 	description = SITE_DESCRIPTION,
 	image = DEFAULT_OG_IMAGE,
 	ogType = 'website',
+	imageAlt = 'Món ăn tại Nhà hàng Cuốn Sinh',
+	noindex = false,
+	capCha = [],
 } = Astro.props;
 const fullTitle = title ? `${title} | ${SITE_NAME}` : SITE_TITLE;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL(image, Astro.site);
+// Đường dẫn phân cấp cho Google (Trang chủ > ... > trang này). Trang chủ và trang
+// lỗi không cần. Trang chủ tự khai nhà hàng qua slot "head".
+const duongDan =
+	title && !noindex && Astro.url.pathname !== '/'
+		? goiLd(duongDanLd(Astro.site, [...capCha, { ten: title, path: Astro.url.pathname }]))
+		: null;
 ---
 
 <!doctype html>
@@ -34,14 +51,26 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 		<title>{fullTitle}</title>
 		<meta name="description" content={description} />
 		<meta name="theme-color" content="#fbf8f1" />
-		<link rel="canonical" href={canonical} />
+		{
+			noindex ? (
+				<meta name="robots" content="noindex,follow" />
+			) : (
+				<>
+					<meta name="robots" content="index,follow,max-image-preview:large" />
+					<link rel="canonical" href={canonical} />
+				</>
+			)
+		}
 		<meta property="og:type" content={ogType} />
 		<meta property="og:locale" content="vi_VN" />
 		<meta property="og:site_name" content={SITE_NAME} />
 		<meta property="og:title" content={fullTitle} />
 		<meta property="og:description" content={description} />
 		<meta property="og:url" content={canonical} />
-		<meta property="og:image" content={new URL(image, Astro.site)} />
+		<meta property="og:image" content={ogImage} />
+		<meta property="og:image:alt" content={imageAlt} />
+		<meta name="twitter:card" content="summary_large_image" />
+		{duongDan && <script is:inline type="application/ld+json" set:html={duongDan} />}
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<!-- iPhone không dùng favicon.svg: thiếu apple-touch-icon thì màn hình chính ra ô đen chữ "C" -->
 		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
