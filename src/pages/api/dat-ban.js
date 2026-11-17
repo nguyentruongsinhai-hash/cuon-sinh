@@ -1,7 +1,8 @@
 // POST /api/dat-ban: nhận form đặt bàn. Chạy trên Worker (không dựng tĩnh).
+// GET /api/dat-ban: các khung giờ quán đang báo hết bàn, để form báo khách lúc chọn giờ.
 // Toàn bộ logic nằm ở src/lib/dat-ban.mjs; file này chỉ nối với Cloudflare.
 import { env } from "cloudflare:workers";
-import { xuLyDatBan } from "../../lib/dat-ban.mjs";
+import { layKhoa, xuLyDatBan } from "../../lib/dat-ban.mjs";
 
 export const prerender = false;
 
@@ -27,6 +28,11 @@ export async function POST({ request }) {
   return tra(kq.status, kq.body);
 }
 
+export async function GET() {
+  const kq = await layKhoa(env, { log: console.error });
+  return tra(kq.status, kq.body);
+}
+
 export function ALL() {
-  return tra(405, { ok: false, thong_bao: "Chỉ nhận POST." });
+  return tra(405, { ok: false, thong_bao: "Chỉ nhận GET và POST." });
 }

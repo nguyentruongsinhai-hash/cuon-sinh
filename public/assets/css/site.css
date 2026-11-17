@@ -340,6 +340,8 @@ button { cursor: pointer; }
 .form__msg:empty { display: none; }
 .form__msg.is-ok { color: var(--ok); padding: 14px 16px; border-radius: var(--radius-sm); background: var(--primary-soft); }
 .form__msg.is-err { color: var(--err); }
+.form__msg.is-warn { color: var(--err); padding: 12px 14px; border-radius: var(--radius-sm); border: 1px solid currentColor; }
+.form__msg.is-warn a { color: inherit; text-decoration: underline; white-space: nowrap; }
 
 /* ---------- Liên hệ ---------- */
 .contacts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
