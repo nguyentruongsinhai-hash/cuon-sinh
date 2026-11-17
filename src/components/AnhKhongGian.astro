@@ -1,0 +1,25 @@
+---
+// Lưới ảnh thật của quán, đặt trong mục "Không gian" (nền màu thương hiệu) ở
+// trang chủ và trang Giới thiệu. Dữ liệu ảnh: src/data/khong-gian.mjs.
+import { ANH_KHONG_GIAN } from '../data/khong-gian.mjs';
+---
+
+<ul class="wrap space-anh reveal">
+	{
+		ANH_KHONG_GIAN.map((a) => (
+			<li>
+				<figure>
+					<img
+						src={'/assets/img/' + a.file}
+						alt={a.moTa}
+						width={a.w}
+						height={a.h}
+						loading="lazy"
+						decoding="async"
+					/>
+					<figcaption>{a.chuThich}</figcaption>
+				</figure>
+			</li>
+		))
+	}
+</ul>

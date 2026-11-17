@@ -286,6 +286,13 @@ button { cursor: pointer; }
 .stats li { padding: 26px 22px; border: 1px solid rgba(255, 255, 255, .28); border-radius: var(--radius); display: grid; gap: 2px; }
 .stats strong { font-size: clamp(2rem, 4vw, 2.75rem); font-weight: 800; line-height: 1.1; }
 .stats span { color: var(--on-brand-muted); font-size: .9688rem; }
+.space-anh { margin-top: 48px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.space-anh figure { margin: 0; }
+.space-anh img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; border-radius: var(--radius); background: rgba(255, 255, 255, .12); }
+.space-anh figcaption { margin-top: 8px; color: var(--on-brand-muted); font-size: .9375rem; }
+@media (max-width: 560px) {
+  .space-anh { margin-top: 32px; grid-template-columns: 1fr; gap: 18px; }
+}
 
 /* ---------- Đặt bàn ---------- */
 .book { display: grid; grid-template-columns: .9fr 1.1fr; gap: 56px; align-items: start; }
