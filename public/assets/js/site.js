@@ -336,6 +336,8 @@
       });
       const j = await r.json();
       if (j.ok) {
+        // Đếm lượt đặt bàn trên Google Analytics. Chỉ gửi tên sự kiện, không kèm thông tin khách.
+        if (typeof window.gtag === "function") window.gtag("event", "dat_ban_thanh_cong", {});
         form.reset();
         ngayMacDinh();
         bao("ok", `Cuốn Sinh đã nhận yêu cầu đặt bàn${j.ma_don ? " (mã " + j.ma_don + ")" : ""}. Nhân viên sẽ gọi lại xác nhận bàn cho anh chị sớm nhất.`);
