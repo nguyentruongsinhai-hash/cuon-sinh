@@ -15,12 +15,23 @@
 //      Hook chỉ là tiếng chuông: gọi hỏng thì đơn vẫn nằm trong sổ và lượt chuông sau
 //      Javis gửi bù, nên lỗi ở bước này không làm hỏng đơn của khách.
 //
+// Khoá đặt bàn khi quán báo hết bàn:
+//   Cùng file Sheets có tab "KHOA DAT BAN". Mỗi dòng là một lần quán báo hết bàn:
+//   cột A ngày, B từ giờ, C đến giờ (bỏ trống giờ = khoá cả ngày), D ghi chú nội bộ,
+//   E trạng thái (để trống = đang khoá; ghi "mở" = có bàn lại). Anh Sinh hoặc nhân
+//   viên thêm dòng trực tiếp, hoặc nhắn Javis để Javis thêm.
+//   Đơn rơi vào khung đang khoá bị từ chối kèm lời mời gọi hotline, và form hỏi
+//   danh sách này (GET /api/dat-ban) để báo khách ngay lúc chọn giờ.
+//   Không đọc được tab thì coi như không khoá: thà nhận thừa một đơn (nhân viên
+//   vẫn gọi lại xác nhận) còn hơn form chết vì một tab phụ.
+//
 // File viết bằng JS thuần, không phụ thuộc Astro hay Cloudflare, để test chạy
 // được bằng `node --test` (fetch và đồng hồ truyền từ ngoài vào).
 //
 // Biến môi trường của Worker (đặt bằng `wrangler secret put`, KHÔNG ghi vào mã):
 //   SHEET_ID         id file Google Sheets sổ đặt bàn
 //   SHEET_TAB        tên tab, mặc định "DAT BAN WEB"
+//   SHEET_TAB_KHOA   tên tab khoá đặt bàn, mặc định "KHOA DAT BAN"
 //   GOOGLE_SA_EMAIL  email service account được chia sẻ quyền sửa file đó
 //   GOOGLE_SA_KEY    private key PEM của service account
 //   JAVIS_HOOK_URL   địa chỉ hook của Javis; để trống thì bỏ qua bước 4
@@ -32,6 +43,9 @@ export const HOTLINE = "0844 566 922";
 export const KHUNG_GIO = [["09:00", "14:00"], ["16:30", "22:00"]];
 export const SO_NGAY_TOI_DA = 60;
 export const TAB_MAC_DINH = "DAT BAN WEB";
+export const TAB_KHOA_MAC_DINH = "KHOA DAT BAN";
+// Thứ tự cột của tab khoá. Đổi ở đây thì phải đổi hàng tiêu đề trong file Sheets.
+export const COT_KHOA = ["Ngày", "Từ giờ", "Đến giờ", "Ghi chú", "Trạng thái"];
 // Một số điện thoại gửi được tối đa chừng này đơn trong một ngày (tính theo ngày gửi).
 export const SO_DON_TOI_DA_MOI_NGAY = 3;
 // Thứ tự cột trong sổ. Đổi ở đây thì phải đổi hàng tiêu đề trong file Sheets.
@@ -72,14 +86,22 @@ export async function xuLyDatBan(d, env = {}, { fetch: fetchFn = globalThis.fetc
     const token = await layTokenGoogle(env.GOOGLE_SA_EMAIL, env.GOOGLE_SA_KEY, fetchFn);
 
     // Chống gửi lặp. Không đọc được sổ thì vẫn nhận đơn: thà dội tin còn hơn mất khách.
-    let cu = [];
-    try {
-      cu = await docDonCu(env, token, don.sdt, fetchFn);
-    } catch (e) {
-      log("dat-ban: khong doc duoc so de do trung", don.ma_don, e && e.message);
-    }
+    // Đọc luôn tab khoá cùng lúc để khách không phải chờ hai lượt gọi nối nhau.
+    const [cu, khoa] = await Promise.all([
+      docDonCu(env, token, don.sdt, fetchFn).catch((e) => {
+        log("dat-ban: khong doc duoc so de do trung", don.ma_don, e && e.message);
+        return [];
+      }),
+      docKhoa(env, token, fetchFn, now).catch((e) => {
+        log("dat-ban: khong doc duoc tab khoa, coi nhu khong khoa", don.ma_don, e && e.message);
+        return [];
+      }),
+    ]);
+    // Đơn đã nhận từ trước khi khoá vẫn còn hiệu lực: gửi lại thì trả mã cũ như thường.
     const yHet = cu.find((x) => x.ngay === don.ngay && x.gio === don.gio);
     if (yHet) return ketQua(200, "ok", { ma_don: yHet.ma_don, trung: true });
+    const k = timKhoa(khoa, don.ngay, don.gio);
+    if (k) return ketQua(409, tinHetBan(k), { het_ban: true });
     const homNay = don.nhan_luc.slice(-10);
     if (cu.filter((x) => x.nhan_luc.endsWith(homNay)).length >= SO_DON_TOI_DA_MOI_NGAY) {
       return ketQua(429, `Số điện thoại này đã gửi ${SO_DON_TOI_DA_MOI_NGAY} yêu cầu đặt bàn hôm nay. Anh/chị cần đổi hoặc đặt thêm xin gọi ${HOTLINE} giúp bên em nhé.`);
@@ -93,6 +115,24 @@ export async function xuLyDatBan(d, env = {}, { fetch: fetchFn = globalThis.fetc
   }
   await baoJavis(env, don, fetchFn, log);
   return ketQua(200, "ok", { ma_don: don.ma_don });
+}
+
+/**
+ * Danh sách khung giờ đang khoá, cho form báo khách ngay lúc chọn giờ.
+ * Chỉ trả ngày và giờ: ghi chú nội bộ ở lại trong sổ. Lỗi thì trả danh sách rỗng,
+ * form chạy như chưa khoá và lớp chặn ở xuLyDatBan vẫn còn đó.
+ */
+export async function layKhoa(env = {}, { fetch: fetchFn = globalThis.fetch, now = new Date(), log = () => {} } = {}) {
+  let khoa = [];
+  try {
+    if (env.SHEET_ID && env.GOOGLE_SA_EMAIL && env.GOOGLE_SA_KEY) {
+      const token = await layTokenGoogle(env.GOOGLE_SA_EMAIL, env.GOOGLE_SA_KEY, fetchFn);
+      khoa = await docKhoa(env, token, fetchFn, now);
+    }
+  } catch (e) {
+    log("dat-ban: khong doc duoc tab khoa", e && e.message);
+  }
+  return { status: 200, body: { ok: true, khoa } };
 }
 
 /**
@@ -175,6 +215,67 @@ function sach(s, max) {
   return String(s).replace(/[\u0000-\u001f]/g, " ").replace(/\s+/g, " ").trim().slice(0, max);
 }
 
+// ---------- khoá đặt bàn ----------
+
+/**
+ * Đổi các dòng của tab khoá thành [{ ngay: "YYYY-MM-DD", tu: "HH:MM", den: "HH:MM" }].
+ * Bỏ qua hàng tiêu đề, dòng trống, dòng sai, ngày đã qua và dòng đã ghi "mở"/"hủy".
+ * Nhân viên gõ tay nên nhận nhiều kiểu: 2026-11-14, 14/11/2026, 14/11; 18:00, 18h, 18h30.
+ */
+export function docDongKhoa(values, now = new Date()) {
+  const homNay = gioVN(now).toISOString().slice(0, 10);
+  const ra = [];
+  for (const h of values || []) {
+    if (/m[oở]|h[uủ][yỷ]/i.test(String(h[4] || "").normalize("NFC"))) continue;
+    const ngay = docNgay(h[0], homNay);
+    if (!ngay || ngay < homNay) continue;
+    const tu = String(h[1] ?? "").trim() ? docGio(h[1]) : "00:00";
+    const den = String(h[2] ?? "").trim() ? docGio(h[2]) : "23:59";
+    if (!tu || !den || tu > den) continue;
+    ra.push({ ngay, tu, den });
+  }
+  return ra;
+}
+
+function docNgay(o, homNay) {
+  const s = String(o ?? "").trim();
+  let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (m) return ngayChuan(m[1], m[2], m[3]);
+  m = s.match(/^(\d{1,2})[/.-](\d{1,2})(?:[/.-](\d{4}))?$/);
+  if (!m) return "";
+  if (m[3]) return ngayChuan(m[3], m[2], m[1]);
+  // Thiếu năm: lấy năm nay; ngày đó đã qua thì hiểu là năm sau (tháng 12 báo khoá tháng 1).
+  const nam = Number(homNay.slice(0, 4));
+  const n = ngayChuan(nam, m[2], m[1]);
+  return n && n < homNay ? ngayChuan(nam + 1, m[2], m[1]) : n;
+}
+
+function ngayChuan(y, m, d) {
+  const s = `${y}-${p2(m)}-${p2(d)}`;
+  return ngayHopLe(s) ? s : "";
+}
+
+function docGio(o) {
+  const m = String(o ?? "").trim().match(/^(\d{1,2})(?:\s*[:hHgG.]\s*(\d{2}))?(?::\d{2})?\s*[hHgG]?$/);
+  if (!m) return "";
+  const h = Number(m[1]);
+  const p = Number(m[2] || 0);
+  return h <= 23 && p <= 59 ? `${p2(h)}:${p2(p)}` : "";
+}
+
+/** Khung khoá đầu tiên chứa ngày giờ này (tính cả hai đầu mút), không có thì undefined. */
+export function timKhoa(khoa, ngay, gio) {
+  return (khoa || []).find((k) => k.ngay === ngay && gio >= k.tu && gio <= k.den);
+}
+
+/** Câu báo cho khách khi khung giờ họ chọn đang hết bàn. */
+export function tinHetBan(k) {
+  const [, m, d] = k.ngay.split("-");
+  const caNgay = k.tu === "00:00" && k.den === "23:59";
+  const luc = caNgay ? `Ngày ${Number(d)}/${Number(m)}` : `Khung giờ ${k.tu}-${k.den} ngày ${Number(d)}/${Number(m)}`;
+  return `${luc} quán đang hết bàn. Anh/chị vui lòng chọn ${caNgay ? "ngày" : "giờ"} khác hoặc gọi hotline ${HOTLINE} để được hỗ trợ.`;
+}
+
 // ---------- thời gian, mã đơn ----------
 
 function gioVN(d) {
@@ -231,6 +332,17 @@ async function docDonCu(env, token, sdt, fetchFn) {
   return (j.values || [])
     .filter((h) => chuanSdt(h[5]) === sdt && !/h[uủ][yỷ]/i.test(String(h[9] || "").normalize("NFC")))
     .map((h) => ({ ma_don: String(h[0] || ""), nhan_luc: String(h[1] || ""), ngay: String(h[2] || ""), gio: String(h[3] || ""), so_nguoi: String(h[6] || "") }));
+}
+
+async function docKhoa(env, token, fetchFn, now) {
+  const vung = encodeURIComponent(`'${env.SHEET_TAB_KHOA || TAB_KHOA_MAC_DINH}'!A:E`);
+  const r = await fetchFn(`https://sheets.googleapis.com/v4/spreadsheets/${env.SHEET_ID}/values/${vung}`, {
+    headers: { authorization: `Bearer ${token}` },
+    signal: AbortSignal.timeout(HAN_GOI_MS),
+  });
+  if (!r.ok) throw new Error(`sheets khoa ${r.status}`);
+  const j = await r.json();
+  return docDongKhoa(j.values, now);
 }
 
 async function ghiSheet(env, don, token, fetchFn) {

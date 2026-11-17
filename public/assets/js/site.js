@@ -200,24 +200,63 @@
   const MOC = [];
   for (const [a, b] of KHUNG) for (let t = a; t <= b; t += 15) MOC.push(t);
 
+  // Khung giờ quán đang báo hết bàn: [{ ngay, tu, den }], lấy từ GET /api/dat-ban.
+  // Chưa tải xong hoặc tải lỗi thì để rỗng: máy chủ vẫn chặn lúc gửi.
+  let KHOA = [];
+  const oKhoa = $("#bao-khoa");
+  const biKhoa = (ngay, g) => KHOA.some((k) => k.ngay === ngay && g >= k.tu && g <= k.den);
+
+  function baoKhoa(ngay, hetCa) {
+    if (!oKhoa) return;
+    oKhoa.textContent = "";
+    const ks = KHOA.filter((k) => k.ngay === ngay);
+    if (!ks.length) return;
+    const [, m, d] = ngay.split("-");
+    const ngayNgan = `${Number(d)}/${Number(m)}`;
+    const khung = ks.map((k) => `${k.tu}-${k.den}`).join(", ");
+    const caNgay = hetCa || ks.some((k) => k.tu === "00:00" && k.den === "23:59");
+    oKhoa.append(
+      caNgay ? `Ngày ${ngayNgan} quán đang hết bàn. ` : `Ngày ${ngayNgan} quán đang hết bàn khung giờ ${khung}. `,
+      "Anh chị vui lòng chọn " + (caNgay ? "ngày" : "giờ") + " khác hoặc gọi hotline ",
+      Object.assign(document.createElement("a"), { href: "tel:" + HOTLINE.replace(/\s/g, ""), textContent: HOTLINE }),
+      " để được hỗ trợ.",
+    );
+  }
+
   function napGio() {
     const cu = oGio.value;
+    const ngay = oNgay.value;
     let tu = 0;
-    if (oNgay.value === homNay) {
+    if (ngay === homNay) {
       const v = vn();
       tu = v.getUTCHours() * 60 + v.getUTCMinutes() + 60; // đặt trước ít nhất 60 phút
     }
     oGio.innerHTML = "";
-    const con = MOC.filter((t) => t >= tu).map(hh);
-    if (!con.length) {
+    const tatCa = MOC.filter((t) => t >= tu).map(hh);
+    if (!tatCa.length) {
       oGio.add(new Option("Hôm nay đã hết giờ nhận, chọn ngày khác", ""));
+      baoKhoa(ngay, false);
       return;
     }
-    con.forEach((g) => oGio.add(new Option(g, g)));
+    const con = tatCa.filter((g) => !biKhoa(ngay, g));
+    if (!con.length) {
+      oGio.add(new Option("Ngày này quán đang hết bàn, chọn ngày khác", ""));
+      baoKhoa(ngay, true);
+      return;
+    }
+    // Giờ đang khoá vẫn hiện nhưng không chọn được, để khách thấy rõ giờ nào hết bàn
+    tatCa.forEach((g) => {
+      const o = new Option(con.includes(g) ? g : g + " - hết bàn", g);
+      o.disabled = !con.includes(g);
+      oGio.add(o);
+    });
     if (con.includes(cu)) oGio.value = cu;
     else if (con.includes("18:30")) oGio.value = "18:30";
+    else oGio.value = con[0];
+    baoKhoa(ngay, false);
   }
-  oNgay.addEventListener("change", napGio);
+  let khachDaChonNgay = false;
+  oNgay.addEventListener("change", () => { khachDaChonNgay = true; napGio(); });
   // Mặc định hôm nay; nếu hôm nay đã hết giờ nhận thì nhảy sang ngày mai
   function ngayMacDinh() {
     oNgay.value = homNay;
@@ -228,6 +267,15 @@
     }
   }
   ngayMacDinh();
+
+  function taiKhoa() {
+    return fetch("/api/dat-ban")
+      .then((r) => r.json())
+      .then((j) => { KHOA = Array.isArray(j.khoa) ? j.khoa : []; })
+      .catch(() => {});
+  }
+  // Lúc mới mở trang khách chưa chọn gì: nếu hôm nay hết bàn cả ngày thì nhảy sang ngày mai
+  taiKhoa().then(() => { if (!KHOA.length) return; if (khachDaChonNgay) napGio(); else ngayMacDinh(); });
 
   // Nút cộng trừ số người
   const kep = (n) => Math.min(60, Math.max(1, n || 1));
@@ -293,6 +341,8 @@
         bao("ok", `Cuốn Sinh đã nhận yêu cầu đặt bàn${j.ma_don ? " (mã " + j.ma_don + ")" : ""}. Nhân viên sẽ gọi lại xác nhận bàn cho anh chị sớm nhất.`);
       } else {
         bao("err", j.thong_bao || "Chưa gửi được, vui lòng thử lại.");
+        // Quán vừa báo hết bàn sau khi khách mở trang: tải lại để ô giờ khoá đúng khung đó
+        if (j.het_ban) taiKhoa().then(napGio);
       }
     } catch {
       bao("err", `Chưa gửi được yêu cầu. Anh chị gọi ${HOTLINE} để giữ bàn nhé.`);

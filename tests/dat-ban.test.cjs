@@ -23,12 +23,17 @@ const ENV = {
   GOOGLE_SA_KEY: privateKey.export({ type: "pkcs8", format: "pem" }),
 };
 
-function fetchGia({ sheetsOk = true, hook = 202, dong = [], docOk = true } = {}) {
+function fetchGia({ sheetsOk = true, hook = 202, dong = [], docOk = true, khoa = [], khoaOk = true } = {}) {
   const goi = [];
   const fn = async (url, init = {}) => {
     goi.push({ url: String(url), init });
     if (String(url).startsWith("https://oauth2.googleapis.com/token")) {
       return new Response(JSON.stringify({ access_token: "token-gia" }), { status: 200 });
+    }
+    if (String(url).startsWith("https://sheets.googleapis.com/") && String(url).includes("KHOA%20DAT%20BAN")) {
+      // đọc tab khoá đặt bàn: `khoa` là các dòng nhân viên đã báo hết bàn
+      if (!khoaOk) return new Response("khong co tab", { status: 400 });
+      return new Response(JSON.stringify({ values: [["Ngày", "Từ giờ", "Đến giờ", "Ghi chú", "Trạng thái"], ...khoa] }), { status: 200 });
     }
     if (String(url).startsWith("https://sheets.googleapis.com/") && (init.method || "GET") === "GET") {
       // đọc sổ để dò đơn trùng: `dong` là các dòng đã có (không tính hàng tiêu đề)
@@ -262,4 +267,109 @@ test("không đọc được sổ để dò trùng thì vẫn nhận đơn, khô
   const kq = await xuLyDatBan(DON, ENV, { fetch: fetchFn, now: BAY_GIO });
   assert.equal(kq.status, 200);
   assert.equal(fetchFn.goi.filter(laGhi).length, 1);
+});
+
+// ---------- khoá đặt bàn khi quán báo hết bàn ----------
+
+const laDocKhoa = (g) => g.url.includes("KHOA%20DAT%20BAN");
+
+test("quán báo hết bàn một khung giờ: đơn rơi vào khung đó bị từ chối, mời gọi hotline, không ghi sổ", async () => {
+  const { xuLyDatBan } = await nap();
+  const fetchFn = fetchGia({ khoa: [["2026-11-14", "18:00", "20:00", "kín bàn tầng 2", ""]] });
+  const kq = await xuLyDatBan(DON, ENV_HOOK, { fetch: fetchFn, now: BAY_GIO });
+  assert.equal(kq.status, 409);
+  assert.equal(kq.body.ok, false);
+  assert.equal(kq.body.het_ban, true);
+  assert.match(kq.body.thong_bao, /hết bàn/);
+  assert.match(kq.body.thong_bao, /18:00-20:00/);
+  assert.match(kq.body.thong_bao, /14\/11/);
+  assert.match(kq.body.thong_bao, /0844 566 922/);
+  assert.doesNotMatch(kq.body.thong_bao, /tầng 2/, "ghi chú nội bộ không được lộ ra cho khách");
+  assert.equal(fetchFn.goi.filter(laGhi).length, 0, "đơn vào khung khoá vẫn bị ghi sổ");
+  assert.equal(fetchFn.goi.filter(laHook).length, 0, "đơn vào khung khoá vẫn rung chuông Javis");
+});
+
+test("giờ ngoài khung khoá, ngày khác, hoặc khoá đã mở lại thì vẫn nhận đơn", async () => {
+  const { xuLyDatBan } = await nap();
+  const cac = [
+    [["2026-11-14", "11:00", "13:00", "", ""]], // cùng ngày, khác khung
+    [["2026-11-15", "18:00", "20:00", "", ""]], // khác ngày
+    [["2026-11-14", "18:00", "20:00", "", "Đã mở"]], // quán báo có bàn lại
+    [["", "", "", "", ""], ["ghi linh tinh", "18:00", "20:00"]], // dòng trống, dòng sai ngày
+  ];
+  for (const khoa of cac) {
+    const fetchFn = fetchGia({ khoa });
+    const kq = await xuLyDatBan(DON, ENV, { fetch: fetchFn, now: BAY_GIO });
+    assert.equal(kq.status, 200, JSON.stringify(khoa));
+    assert.equal(fetchFn.goi.filter(laGhi).length, 1);
+  }
+});
+
+test("khoá cả ngày (để trống giờ) và cách nhân viên hay gõ ngày giờ đều được hiểu", async () => {
+  const { xuLyDatBan, docDongKhoa } = await nap();
+  const kq = await xuLyDatBan(DON, ENV, { fetch: fetchGia({ khoa: [["14/11/2026", "", "", "", ""]] }), now: BAY_GIO });
+  assert.equal(kq.status, 409);
+  assert.match(kq.body.thong_bao, /^Ngày 14\/11 quán đang hết bàn/);
+  assert.match(kq.body.thong_bao, /chọn ngày khác/);
+  assert.match(kq.body.thong_bao, /0844 566 922/);
+
+  assert.deepEqual(
+    docDongKhoa([
+      ["Ngày", "Từ giờ", "Đến giờ"],
+      ["14/11/2026", "18h", "20h30"],
+      ["15/11", "18:00:00", "19:30:00"], // thiếu năm: lấy năm hiện tại
+      ["2026-11-16", "", "13"],
+      ["2026-11-17", "17:00"],
+      ["2026-11-12", "18:00", "20:00"], // ngày đã qua: bỏ
+      ["2026-11-18", "20:00", "18:00"], // giờ ngược: bỏ
+      ["2026-11-19", "18:00", "20:00", "", "mở"], // đã mở lại: bỏ
+    ], BAY_GIO),
+    [
+      { ngay: "2026-11-14", tu: "18:00", den: "20:30" },
+      { ngay: "2026-11-15", tu: "18:00", den: "19:30" },
+      { ngay: "2026-11-16", tu: "00:00", den: "13:00" },
+      { ngay: "2026-11-17", tu: "17:00", den: "23:59" },
+    ],
+  );
+});
+
+test("không đọc được tab khoá (chưa tạo tab, Google lỗi) thì vẫn nhận đơn như cũ", async () => {
+  const { xuLyDatBan } = await nap();
+  const nhat = [];
+  const fetchFn = fetchGia({ khoaOk: false });
+  const kq = await xuLyDatBan(DON, ENV, { fetch: fetchFn, now: BAY_GIO, log: (...a) => nhat.push(a.join(" ")) });
+  assert.equal(kq.status, 200);
+  assert.equal(fetchFn.goi.filter(laGhi).length, 1);
+  assert.equal(nhat.length, 1, "phải ghi nhật ký để biết khoá đang không chạy");
+});
+
+test("đơn đã nhận trước khi khoá, khách gửi lại y hệt: vẫn trả mã cũ, không báo hết bàn", async () => {
+  const { xuLyDatBan } = await nap();
+  const fetchFn = fetchGia({ dong: [DONG_CU], khoa: [["2026-11-14", "18:00", "20:00"]] });
+  const kq = await xuLyDatBan(DON, ENV, { fetch: fetchFn, now: BAY_GIO });
+  assert.equal(kq.status, 200);
+  assert.equal(kq.body.ma_don, "WEB261113-AAAA");
+});
+
+test("GET danh sách khoá cho form: chỉ trả ngày giờ đang khoá, không lộ ghi chú; lỗi thì trả rỗng", async () => {
+  const { layKhoa } = await nap();
+  const fetchFn = fetchGia({ khoa: [["2026-11-14", "18:00", "20:00", "khách đoàn anh B 0912345678", ""], ["2026-11-10", "", ""]] });
+  const kq = await layKhoa(ENV, { fetch: fetchFn, now: BAY_GIO });
+  assert.equal(kq.status, 200);
+  assert.deepEqual(kq.body, { ok: true, khoa: [{ ngay: "2026-11-14", tu: "18:00", den: "20:00" }] });
+  assert.equal(fetchFn.goi.filter(laDocKhoa).length, 1);
+
+  assert.deepEqual((await layKhoa(ENV, { fetch: fetchGia({ khoaOk: false }), now: BAY_GIO })).body, { ok: true, khoa: [] });
+  assert.deepEqual((await layKhoa({}, { fetch: fetchGia(), now: BAY_GIO })).body, { ok: true, khoa: [] });
+});
+
+test("form báo khách biết khung giờ hết bàn ngay lúc chọn, kèm hotline", () => {
+  const api = fs.readFileSync(path.join(ROOT, "src", "pages", "api", "dat-ban.js"), "utf8");
+  assert.match(api, /export async function GET/);
+  const js = fs.readFileSync(path.join(ROOT, "public", "assets", "js", "site.js"), "utf8");
+  assert.match(js, /fetch\("\/api\/dat-ban"\)/, "form chưa hỏi danh sách khung giờ khoá");
+  assert.match(js, /hết bàn/);
+  assert.match(js, /bao-khoa/);
+  const form = fs.readFileSync(path.join(ROOT, "src", "components", "FormDatBan.astro"), "utf8");
+  assert.match(form, /id="bao-khoa"[^>]*aria-live="polite"/, "thiếu dòng báo hết bàn cho người dùng trình đọc màn hình");
 });
