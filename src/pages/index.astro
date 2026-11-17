@@ -7,6 +7,7 @@ import TheCombo from '../components/TheCombo.astro';
 import TheMon from '../components/TheMon.astro';
 import DongLienHe from '../components/DongLienHe.astro';
 import { MESSENGER_URL } from '../consts';
+import { goiLd, nhaHangLd, webSiteLd } from '../lib/schema.mjs';
 import { COMBO, NHOM_MON, giaVN, monTrangChu, nhomTrangChu } from '../data/thuc-don.mjs';
 
 // Mục thực đơn: tab "Nổi bật" và mỗi nhóm tối đa 4 món, đủ món nằm ở trang /thuc-don/.
@@ -14,34 +15,14 @@ const nhomHome = nhomTrangChu();
 const soNguoi = [...new Set(COMBO.map((c) => c.nguoi))];
 const monBia = NHOM_MON.flatMap((n) => n.mon).find((m) => m.ten === 'Set cuốn tổng hợp');
 const comboRe = COMBO.reduce((a, b) => (b.gia < a.gia ? b : a));
+// Dữ liệu có cấu trúc: nhà hàng (địa chỉ, giờ, thực đơn, đặt bàn) và tên website
+const ld = goiLd(nhaHangLd(Astro.site), webSiteLd(Astro.site));
 ---
 
-<Base ogType="restaurant">
+<Base ogType="restaurant" imageAlt="Lẩu cua sông siêu gạch tại Nhà hàng Cuốn Sinh">
 <Fragment slot="head">
 <link rel="preload" as="image" href="/assets/img/set-cuon-tong-hop.webp" fetchpriority="high">
-<script is:inline type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Restaurant",
-  "name": "Nhà hàng Cuốn Sinh",
-  "url": "https://cuonsinh.com/",
-  "telephone": "+84844566922",
-  "servesCuisine": ["Món Việt", "Món cuốn", "Lẩu"],
-  "hasMenu": "https://cuonsinh.com/thuc-don/",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "Số 3, ngõ 58 Vũ Trọng Phụng",
-    "addressLocality": "Thanh Xuân",
-    "addressRegion": "Hà Nội",
-    "addressCountry": "VN"
-  },
-  "openingHoursSpecification": [
-    {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"], "opens": "09:00", "closes": "14:00"},
-    {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"], "opens": "16:30", "closes": "22:00"}
-  ],
-  "sameAs": ["https://www.facebook.com/nhahangcuonsinh"]
-}
-</script>
+<script is:inline type="application/ld+json" set:html={ld} />
 </Fragment>
 
 <!-- ============ 1. HERO ============ -->
@@ -209,6 +190,7 @@ const comboRe = COMBO.reduce((a, b) => (b.gia < a.gia ? b : a));
         <h3>Địa chỉ</h3>
         <p>Số 3, ngõ 58 Vũ Trọng Phụng, Thanh Xuân, Hà Nội</p>
         <a class="link" href="https://www.google.com/maps/search/?api=1&amp;query=Nh%C3%A0+h%C3%A0ng+Cu%E1%BB%91n+Sinh%2C+S%E1%BB%91+3+ng%C3%B5+58+V%C5%A9+Tr%E1%BB%8Dng+Ph%E1%BB%A5ng%2C+Thanh+Xu%C3%A2n%2C+H%C3%A0+N%E1%BB%99i" target="_blank" rel="noopener">Chỉ đường trên Google Maps</a>
+        <a class="link" href="/lien-he/">Xem bản đồ và giờ mở cửa</a>
       </li>
       <li class="contact reveal">
         <h3>Giờ nhận khách</h3>

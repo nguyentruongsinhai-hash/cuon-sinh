@@ -1,0 +1,7 @@
+# cuonsinh.com: cho mọi công cụ tìm kiếm đọc toàn bộ trang.
+# /api/ là đường nhận form đặt bàn, không có gì để lên kết quả tìm kiếm.
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://cuonsinh.com/sitemap-index.xml

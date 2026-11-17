@@ -1,0 +1,90 @@
+---
+// Trang Liên hệ: địa chỉ, giờ nhận khách, số gọi và bản đồ ở MỘT địa chỉ riêng
+// (/lien-he/) để Google có trang trả lời thẳng câu "Cuốn Sinh ở đâu, mở mấy giờ".
+// Địa chỉ và giờ lấy từ src/consts.ts, cùng nguồn với dữ liệu có cấu trúc.
+import DongLienHe from '../components/DongLienHe.astro';
+import {
+	CA_MO_CUA,
+	DIA_CHI_DAY_DU,
+	FACEBOOK_URL,
+	HOTLINE,
+	HOTLINE_TEL,
+	MAPS_EMBED_URL,
+	MAPS_URL,
+	TEN_QUAN,
+} from '../consts';
+import Base from '../layouts/Base.astro';
+import { goiLd, nhaHangLd } from '../lib/schema.mjs';
+
+const ld = goiLd(nhaHangLd(Astro.site));
+// "09:00" -> "9:00" cho giống cách ghi giờ ở trang chủ
+const gio = (s: string) => s.replace(/^0/, '');
+---
+
+<Base
+	title="Liên hệ và chỉ đường"
+	description={`Địa chỉ, giờ mở cửa, số điện thoại đặt bàn và bản đồ chỉ đường tới ${TEN_QUAN}: ${DIA_CHI_DAY_DU}. Hotline ${HOTLINE}.`}
+>
+	<script is:inline slot="head" type="application/ld+json" set:html={ld} />
+
+	<header class="page-head wrap">
+		<p class="eyebrow">Ghé quán</p>
+		<h1>Liên hệ và chỉ đường tới Cuốn Sinh</h1>
+		<p class="lead">
+			{TEN_QUAN} ở {DIA_CHI_DAY_DU}. Quán mở cả tuần, hai ca trưa và tối.
+		</p>
+	</header>
+
+	<section class="sec sec--tight" aria-labelledby="h-thong-tin">
+		<div class="wrap">
+			<h2 class="sr-only" id="h-thong-tin">Địa chỉ, giờ mở cửa và số điện thoại</h2>
+			<ul class="contacts contacts--3">
+				<li class="contact">
+					<h3>Địa chỉ</h3>
+					<p>{DIA_CHI_DAY_DU}</p>
+					<a class="link" href={MAPS_URL} target="_blank" rel="noopener">Chỉ đường trên Google Maps</a>
+				</li>
+				<li class="contact">
+					<h3>Giờ nhận khách</h3>
+					<p>
+						{
+							CA_MO_CUA.map((c, i) => (
+								<>
+									{i > 0 && <br />}
+									{c.ten} {gio(c.mo)} - {gio(c.dong)}
+								</>
+							))
+						}
+					</p>
+					<p class="contact__phu">Tất cả các ngày trong tuần</p>
+				</li>
+				<li class="contact">
+					<h3>Đặt bàn, hỏi món</h3>
+					<DongLienHe />
+					<a class="link" href="/dat-ban/">Đặt bàn trực tuyến</a>
+				</li>
+			</ul>
+
+			<div class="map">
+				<iframe
+					title={'Bản đồ vị trí ' + TEN_QUAN}
+					src={MAPS_EMBED_URL}
+					loading="lazy"
+					referrerpolicy="no-referrer-when-downgrade"
+					allowfullscreen></iframe>
+			</div>
+
+			<div class="cta-box">
+				<div>
+					<h2>Đi nhóm đông hoặc liên hoan?</h2>
+					<p>
+						Gọi <a href={HOTLINE_TEL}>{HOTLINE}</a> để quán xếp bàn trước, hoặc xem
+						<a href="/thuc-don/">thực đơn và bảng giá</a>. Món mới và ưu đãi có trên
+						<a href={FACEBOOK_URL} target="_blank" rel="noopener">fanpage Cuốn Sinh</a>.
+					</p>
+				</div>
+				<a class="btn btn--primary btn--lg" href="/dat-ban/">Đặt bàn ngay</a>
+			</div>
+		</div>
+	</section>
+</Base>

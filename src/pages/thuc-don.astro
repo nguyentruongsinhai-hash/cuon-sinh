@@ -13,6 +13,7 @@ const trang = new URL('/thuc-don/', Astro.site).href;
 const ld = {
 	'@context': 'https://schema.org',
 	'@type': 'Menu',
+	'@id': trang + '#thuc-don',
 	name: 'Thực đơn Cuốn Sinh',
 	url: trang,
 	inLanguage: 'vi',
@@ -30,7 +31,7 @@ const ld = {
 ---
 
 <Base
-	title="Thực đơn"
+	title="Thực đơn và bảng giá"
 	description="Thực đơn đầy đủ của Nhà hàng Cuốn Sinh kèm giá: món cuốn, lẩu, món chính, gỏi nộm, khai vị, rau, cơm xôi, combo theo số người và đồ uống."
 >
 	<script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(ld)} />

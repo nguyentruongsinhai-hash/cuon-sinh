@@ -10,7 +10,7 @@ type Props = CollectionEntry<'blog'>['data'];
 const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 ---
 
-<Base title={title} description={description} ogType="article">
+<Base title={title} description={description} ogType="article" capCha={[{ ten: 'Tin tức', path: '/blog/' }]}>
 	<article class="article">
 		<header class="page-head wrap wrap--narrow">
 			<p class="eyebrow"><a href="/blog/">Tin tức</a></p>
