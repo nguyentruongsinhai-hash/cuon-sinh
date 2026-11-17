@@ -77,3 +77,19 @@ test("trang Liên hệ có địa chỉ, giờ, bản đồ và nằm ở chân 
   assert.match(html, /<iframe[\s\S]*?title=[\s\S]*?loading="lazy"/, "bản đồ phải có tên và tải lười");
   assert.match(read("src", "components", "Footer.astro"), /href="\/lien-he\/"/);
 });
+
+// Chủ quán gửi mã đo 18/11/2026. Thẻ Google Analytics nằm ở khung chung nên mọi trang
+// đều được đếm; form đặt bàn gửi xong thì báo một sự kiện để đếm lượt đặt bàn.
+test("mọi trang gắn Google Analytics và đếm lượt đặt bàn", () => {
+  assert.match(read("src", "consts.ts"), /export const GA_ID = 'G-10WBWYDWB8';/);
+  const base = read("src", "layouts", "Base.astro");
+  assert.match(base, /googletagmanager\.com\/gtag\/js\?id=\$\{GA_ID\}/);
+  assert.match(base, /<script is:inline async src=\{gaSrc\}>/);
+  assert.match(base, /gtag\('config', GA_ID\)/);
+  const js = read("public", "assets", "js", "site.js");
+  assert.match(js, /gtag\("event", "dat_ban_thanh_cong"/);
+  // Không gửi tên hay số điện thoại của khách sang Google
+  const m = js.match(/gtag\("event", "dat_ban_thanh_cong",[^)]*\)/);
+  assert.ok(m && !/ten|sdt|dien_thoai|phone/i.test(m[0].replace("dat_ban_thanh_cong", "")), "sự kiện không được kèm thông tin cá nhân");
+  assert.match(read("src", "pages", "chinh-sach-bao-mat.astro"), /Google Analytics/);
+});
