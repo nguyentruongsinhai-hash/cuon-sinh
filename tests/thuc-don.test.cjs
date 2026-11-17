@@ -225,7 +225,8 @@ test("trang chủ: chữ Combo to hơn một cỡ so với dòng tiêu đề bê
 // "Món cuốn · Lẩu · Món Việt chia sẻ" (xem lượt 3 bên dưới).
 test("chữ đầu mục nào đứng trên tiêu đề h2 cũng dùng cỡ lớn, trên h1 thì giữ cỡ nhỏ trừ dòng đầu trang", () => {
   const nhan = /<p class="(eyebrow[^"]*)">([^<]*(?:<a [^>]*>[^<]*<\/a>)?)<\/p>\s*<(h1|h2)/g;
-  const NHAN_DAU_TRANG = "Món cuốn · Lẩu · Món Việt chia sẻ";
+  // Chủ quán chốt 18/11/2026: "Về Cuốn Sinh" đầu trang Giới thiệu cũng bằng cỡ "Vì sao là Cuốn Sinh".
+  const NHAN_DAU_TRANG = ["Món cuốn · Lẩu · Món Việt chia sẻ", "Về Cuốn Sinh"];
   let soMucLon = 0;
   let soNhanDauTrang = 0;
   for (const trang of ["index.astro", "about.astro", "dat-ban.astro", "thuc-don.astro"]) {
@@ -237,7 +238,7 @@ test("chữ đầu mục nào đứng trên tiêu đề h2 cũng dùng cỡ lớ
       if (the === "h2") {
         assert.ok(lon, trang + ': chữ đầu mục "' + chu + '" phải to hơn tiêu đề bên dưới');
         soMucLon += 1;
-      } else if (chu === NHAN_DAU_TRANG) {
+      } else if (NHAN_DAU_TRANG.includes(chu)) {
         // Chủ quán chốt 13/11/2026 (lượt 3): dòng này bằng cỡ chữ đầu mục các phần khác.
         assert.ok(lon, trang + ': dòng "' + chu + '" phải bằng cỡ chữ đầu mục');
         soNhanDauTrang += 1;
@@ -247,7 +248,7 @@ test("chữ đầu mục nào đứng trên tiêu đề h2 cũng dùng cỡ lớ
     }
   }
   assert.equal(soMucLon, 9, "trang chủ có 6 mục, trang giới thiệu có 3 mục");
-  assert.equal(soNhanDauTrang, 2, "dòng đầu trang có ở trang chủ và trang thực đơn");
+  assert.equal(soNhanDauTrang, 3, "dòng đầu trang cỡ lớn có ở trang chủ, trang thực đơn và trang giới thiệu");
 });
 
 // Chủ quán chốt 13/11/2026 (lượt 3): chữ đầu mục và dòng tiêu đề bên dưới đang to,
